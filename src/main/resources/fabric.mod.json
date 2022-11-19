@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "universal_shops",
+  "version": "${version}",
+  "name": "Universal Shops",
+  "description": "Universal trade shop mod for your Minecraft server!",
+  "authors": [
+    "Patbox"
+  ],
+  "contact": {
+    "homepage": "https://pb4.eu",
+    "sources": "https://github.com/Patbox/UniversalShops"
+  },
+
+  "license": "LGPLv3",
+  "icon": "assets/universal_shops/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "eu.pb4.universalshops.UniversalShopsMod"
+    ]
+  },
+  "mixins": [
+    "universal_shops.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.14.9",
+    "fabric-api": "*",
+    "minecraft": "1.19.2",
+    "java": ">=17"
+  }
+}
