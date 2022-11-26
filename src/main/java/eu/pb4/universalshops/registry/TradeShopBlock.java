@@ -1,6 +1,7 @@
 package eu.pb4.universalshops.registry;
 
 import eu.pb4.polymer.api.block.PolymerHeadBlock;
+import net.fabricmc.fabric.api.block.BlockAttackInteractionAware;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -21,7 +22,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class TradeShopBlock extends BlockWithEntity implements PolymerHeadBlock {
+public class TradeShopBlock extends BlockWithEntity implements PolymerHeadBlock, BlockAttackInteractionAware {
     public static Property<Direction> ATTACHED = EnumProperty.of("attachment", Direction.class, (x) -> x != Direction.UP);
     public final boolean isAdmin;
 
@@ -119,5 +120,14 @@ public class TradeShopBlock extends BlockWithEntity implements PolymerHeadBlock 
 
     private <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
         ((TradeShopBlockEntity) t).tick();
+    }
+
+    @Override
+    public boolean onAttackInteraction(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, Direction direction) {
+        if (world.getBlockEntity(pos) instanceof TradeShopBlockEntity shop && shop.isOwner(player) && shop.priceHandler.canSwitch()) {
+            return false;
+        }
+
+        return true;
     }
 }
