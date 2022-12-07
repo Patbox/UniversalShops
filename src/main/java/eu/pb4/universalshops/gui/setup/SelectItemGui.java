@@ -1,5 +1,6 @@
 package eu.pb4.universalshops.gui.setup;
 
+import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
 import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
@@ -9,11 +10,12 @@ import eu.pb4.universalshops.gui.GuiElements;
 import eu.pb4.universalshops.other.TextUtil;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemStackSet;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.registry.Registry;
 
 public class SelectItemGui extends SimpleGui implements ExtraGui {
 
@@ -28,12 +30,12 @@ public class SelectItemGui extends SimpleGui implements ExtraGui {
         this.holder = holder;
         this.closeRunnable = closeRunnable;
 
-        for (var item : Registry.ITEM) {
-            try {
-                item.appendStacks(ItemGroup.SEARCH, this.items);
-            } catch (Throwable e) {
-                e.printStackTrace();
+        {
+            var items = ItemStackSet.create();
+            for (var group : PolymerItemGroupUtils.getItemGroups(player)) {
+                items.addAll(PolymerItemGroupUtils.getContentsFor(player, group).main());
             }
+            this.items.addAll(items);
         }
 
         for (int i = 0; i < 9; i++) {

@@ -1,8 +1,9 @@
 package eu.pb4.universalshops.registry;
 
 import com.mojang.authlib.GameProfile;
-import eu.pb4.polymer.api.block.PolymerHeadBlock;
-import eu.pb4.polymer.api.item.PolymerHeadBlockItem;
+import eu.pb4.polymer.core.api.block.PolymerHeadBlock;
+import eu.pb4.polymer.core.api.item.PolymerHeadBlockItem;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -12,7 +13,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class TradeShopBlockItem extends PolymerHeadBlockItem {
-    public TradeShopBlockItem(PolymerHeadBlock block, Settings settings) {
+    public <T extends Block & PolymerHeadBlock> TradeShopBlockItem(T block, Settings settings) {
         super(block, settings);
     }
 

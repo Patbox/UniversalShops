@@ -74,7 +74,7 @@ public abstract class SingleGenericShopGui extends BaseShopGui {
                 List<Text> tooltip;
 
                 try {
-                    tooltip = item.getTooltip(this.player, TooltipContext.Default.NORMAL);
+                    tooltip = item.getTooltip(this.player, TooltipContext.Default.BASIC);
                 } catch (Throwable e) {
                     tooltip = List.of(item.getName());
                 }
@@ -104,7 +104,7 @@ public abstract class SingleGenericShopGui extends BaseShopGui {
                 List<Text> tooltip;
 
                 try {
-                    tooltip = item.getTooltip(this.player, TooltipContext.Default.NORMAL);
+                    tooltip = item.getTooltip(this.player, TooltipContext.Default.BASIC);
                 } catch (Throwable e) {
                     tooltip = List.of(item.getName());
                 }

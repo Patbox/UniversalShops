@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "tradeshop:trade_block"
+        "recipe": "universal_shops:trade_block"
       },
       "trigger": "minecraft:recipe_unlocked"
     },
@@ -36,7 +36,7 @@
         "items": [
           {
             "items": [
-              "tradeshop:trade_block"
+              "universal_shops:trade_block"
             ]
           }
         ]
@@ -54,7 +54,7 @@
   ],
   "rewards": {
     "recipes": [
-      "tradeshop:trade_block"
+      "universal_shops:trade_block"
     ]
   }
 }

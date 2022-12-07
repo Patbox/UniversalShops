@@ -1,6 +1,6 @@
 package eu.pb4.universalshops.gui;
 
-import eu.pb4.polymer.api.utils.PolymerUtils;
+import eu.pb4.polymer.core.api.utils.PolymerUtils;
 
 public class HeadTextures {
     public static final String MISSING_TEXTURE = PolymerUtils.NO_TEXTURE_HEAD_VALUE;
