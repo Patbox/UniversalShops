@@ -62,6 +62,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
         this.priceHandler.writeNbt(nbt);
         this.stockHandler.writeNbt(nbt);
         nbt.putBoolean("AllowHoppers", this.allowHoppers);
+        nbt.putString("HologramMode", this.hologramMode.name());
     }
 
     @Override
@@ -189,8 +190,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
 
     public void openGui(ServerPlayerEntity serverPlayer) {
         if (this.isFullySetup()) {
-            this.stockHandler.openTradeGui(serverPlayer, () -> {
-            });
+            this.stockHandler.openTradeGui(serverPlayer, () -> {});
         } else if (this.isOwner(serverPlayer)) {
             openSettings(serverPlayer);
         } else {
@@ -203,7 +203,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     }
 
     public boolean isOwner(GameProfile gameProfile) {
-        return this.owner != null && this.owner.getId().equals(gameProfile.getId());
+        return !isAdmin() && this.owner != null && this.owner.getId().equals(gameProfile.getId());
     }
 
     public boolean isFullySetup() {

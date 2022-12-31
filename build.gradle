@@ -20,7 +20,7 @@ repositories {
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
 	//maven { url 'https://maven.nucleoid.xyz' }
-	maven { url 'https://maven-nucleoid.pb4.eu' }
+	maven { url 'https://maven.nucleoid.xyz' }
 	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 	mavenLocal()
 }
@@ -34,14 +34,14 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modImplementation include('fr.catcore:server-translations-api:1.4.18+1.19.2')
-	modImplementation include('eu.pb4:polymer-core:0.3.0-rc.3+1.19.3')
+	modImplementation include('fr.catcore:server-translations-api:1.4.19+1.19.3')
+	modImplementation include('eu.pb4:polymer-core:0.3.4+1.19.3')
 	modImplementation include("eu.pb4:hologram-api:0.2.3+1.19.3")
 	modImplementation include("eu.pb4:sgui:1.2.0+1.19.3")
 	modImplementation include("eu.pb4:placeholder-api:2.0.0-pre.2+1.19.3")
 	modImplementation include("eu.pb4:common-protection-api:1.0.0")
 	modImplementation include("eu.pb4:common-economy-api:1.0.0")
-	modImplementation include("me.lucko:fabric-permissions-api:0.1-SNAPSHOT")
+	modImplementation include("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
 
 	// Uncomment the following line to enable the deprecated Fabric API modules. 
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.

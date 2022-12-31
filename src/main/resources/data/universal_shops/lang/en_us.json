@@ -12,7 +12,7 @@
   "gui.universal_shops.shop.title": "%s's Shop",
   "gui.universal_shops.shop.title.admin": "Admin Shop",
 
-  "gui.universal_shops.click_to_buy": "Click to buy",
+  "gui.universal_shops.click_to_buy": "Click item to buy",
   "gui.universal_shops.out_of_stock": "Out of stock!",
   "gui.universal_shops.setup.cant_change_pricehandler.1": "Can't change this setting!",
   "gui.universal_shops.setup.cant_change_pricehandler.2": "Make sure you took all stored currency!",
@@ -67,5 +67,7 @@
   "hologram_type.universal_shops.disabled": "Disabled",
 
   "block.universal_shops.trade_block": "Trade Shop",
-  "block.universal_shops.admin_trade_block": "Admin Trade Shop"
+  "block.universal_shops.admin_trade_block": "Admin Trade Shop",
+
+  "gui.universal_shops.modifying_item.change_item.select_item_group.title": "Select Item Group"
 }
