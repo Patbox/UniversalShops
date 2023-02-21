@@ -3,10 +3,13 @@ package eu.pb4.universalshops.gui.setup;
 import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
 import eu.pb4.polymer.core.impl.interfaces.ItemGroupExtra;
 import eu.pb4.sgui.api.ClickType;
+import eu.pb4.sgui.api.GuiHelpers;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
+import eu.pb4.sgui.api.gui.GuiInterface;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import eu.pb4.universalshops.gui.ExtraGui;
+import eu.pb4.universalshops.gui.GuiBackground;
 import eu.pb4.universalshops.gui.GuiElements;
 import eu.pb4.universalshops.other.TextUtil;
 import net.minecraft.item.*;
@@ -27,19 +30,19 @@ public class SelectItemGui extends SimpleGui implements ExtraGui {
     private static final List<ItemGroup> ITEM_GROUPS = new ArrayList<>();
 
     private final ItemModificatorGui.ItemStackHolder holder;
-    private final Runnable closeRunnable;
+    private final GuiInterface previousGui;
     private ItemGroup currentGroup = ItemGroups.getSearchGroup();
     private List<ItemStack> currentItems = ITEM_GROUP_ITEMS.get(this.currentGroup);
-    private boolean ignore;
     private int page;
 
-    public SelectItemGui(ServerPlayerEntity player, ItemModificatorGui.ItemStackHolder holder, Runnable closeRunnable) {
+    public SelectItemGui(ServerPlayerEntity player, ItemModificatorGui.ItemStackHolder holder) {
         super(ScreenHandlerType.GENERIC_9X6, player, false);
         this.holder = holder;
-        this.closeRunnable = closeRunnable;
-
-        for (int i = 0; i < 9; i++) {
-            this.setSlot(9 * 5 + i, GuiElements.FILLER);
+        this.previousGui = GuiHelpers.getCurrentGui(player);
+        if (!hasTexture()) {
+            for (int i = 0; i < 9; i++) {
+                this.setSlot(9 * 5 + i, GuiElements.FILLER);
+            }
         }
         this.updateItemsVisual();
 
@@ -68,7 +71,7 @@ public class SelectItemGui extends SimpleGui implements ExtraGui {
             this.updateItemsVisual();
         }));
 
-        this.setTitle(TextUtil.gui("modifying_item.change_item.title"));
+        this.setTitle(texture(GuiBackground.SELECTOR_BIG).append(TextUtil.gui("modifying_item.change_item.title")));
         this.open();
     }
 
@@ -86,16 +89,12 @@ public class SelectItemGui extends SimpleGui implements ExtraGui {
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
-        if (!this.ignore && this.closeRunnable != null) {
-            this.closeRunnable.run();
+    public void close() {
+        if (this.previousGui != null) {
+            this.previousGui.open();
+        } else {
+            super.close();
         }
-    }
-
-    @Override
-    public void setIgnore(boolean val) {
-        this.ignore = val;
     }
 
     public static void updateCachedItems(MinecraftServer server) {
@@ -139,8 +138,10 @@ public class SelectItemGui extends SimpleGui implements ExtraGui {
 
             this.updateItemsVisual();
 
-            for (int i = 0; i < 9; i++) {
-                this.setSlot(9 * 5 + i, GuiElements.FILLER);
+            if (!hasTexture()) {
+                for (int i = 0; i < 9; i++) {
+                    this.setSlot(9 * 5 + i, GuiElements.FILLER);
+                }
             }
             this.updateItemsVisual();
             this.setSlot(5 * 9 + 2, GuiElements.previousPage(() -> {
@@ -159,7 +160,7 @@ public class SelectItemGui extends SimpleGui implements ExtraGui {
                 this.updateItemsVisual();
             }));
 
-            this.setTitle(TextUtil.gui("modifying_item.change_item.select_item_group.title"));
+            this.setTitle(texture(GuiBackground.SELECTOR_BIG).append(TextUtil.gui("modifying_item.change_item.select_item_group.title")));
             this.open();
         }
 
@@ -199,7 +200,6 @@ public class SelectItemGui extends SimpleGui implements ExtraGui {
                 SelectItemGui.this.updateItemsVisual();
             }
 
-            this.close(true);
             SelectItemGui.this.open();
 
         }

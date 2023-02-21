@@ -32,7 +32,7 @@ public abstract class StockHandler extends GenericHandler {
     public static void init() {
     }
 
-    public abstract void openTradeGui(ServerPlayerEntity player, Runnable close);
+    public abstract void openTradeGui(ServerPlayerEntity player);
     
     public final NbtCompound writeNbt(NbtCompound nbt) {
         nbt.putString("StockType", this.definition.type);
@@ -103,7 +103,7 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
-        public void openTradeGui(ServerPlayerEntity player, Runnable close) {
+        public void openTradeGui(ServerPlayerEntity player) {
 
         }
 
@@ -159,8 +159,8 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
-        public void openTradeGui(ServerPlayerEntity player, Runnable close) {
-            new SingleItemShopGui(player, this.shop, close);
+        public void openTradeGui(ServerPlayerEntity player) {
+            new SingleItemShopGui(player, this.shop);
         }
 
         @Override
@@ -236,8 +236,8 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
-        public void openTradeGui(ServerPlayerEntity player, Runnable close) {
-            new AnyStackShopGui(player, this.shop, close);
+        public void openTradeGui(ServerPlayerEntity player) {
+            new AnyStackShopGui(player, this.shop);
         }
 
         @Override

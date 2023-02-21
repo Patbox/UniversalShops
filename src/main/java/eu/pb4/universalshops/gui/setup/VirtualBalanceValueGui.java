@@ -1,6 +1,8 @@
 package eu.pb4.universalshops.gui.setup;
 
+import eu.pb4.sgui.api.GuiHelpers;
 import eu.pb4.sgui.api.gui.AnvilInputGui;
+import eu.pb4.sgui.api.gui.GuiInterface;
 import eu.pb4.universalshops.gui.GuiElements;
 import eu.pb4.universalshops.gui.ShopGui;
 import eu.pb4.universalshops.other.TextUtil;
@@ -12,14 +14,12 @@ import net.minecraft.util.Formatting;
 public class VirtualBalanceValueGui extends AnvilInputGui implements ShopGui {
     private final PriceHandler.VirtualBalance handler;
     private final TradeShopBlockEntity be;
-    private final Runnable closeRunnable;
-    private boolean ignore;
+    private final GuiInterface previousGui;
     private boolean valid;
 
-    public VirtualBalanceValueGui(ServerPlayerEntity player, TradeShopBlockEntity be, Runnable closeRunnable) {
+    public VirtualBalanceValueGui(ServerPlayerEntity player, TradeShopBlockEntity be) {
         super(player, false);
         this.be = be;
-        this.closeRunnable = closeRunnable;
         this.handler  = ((PriceHandler.VirtualBalance) be.priceHandler);
         this.setSlot(1, GuiElements.FILLER);
         this.setSlot(2, GuiElements.BACK);
@@ -27,6 +27,7 @@ public class VirtualBalanceValueGui extends AnvilInputGui implements ShopGui {
 
         this.setDefaultInputValue(x);
         this.onInput(x);
+        this.previousGui = GuiHelpers.getCurrentGui(player);
         this.open();
     }
 
@@ -54,24 +55,15 @@ public class VirtualBalanceValueGui extends AnvilInputGui implements ShopGui {
 
     @Override
     public void close() {
-        this.close(closeRunnable != null && !this.ignore);
-    }
-
-    @Override
-    public void onClose() {
-        if (closeRunnable != null && !this.ignore) {
-            this.closeRunnable.run();
+        if (this.previousGui != null) {
+            this.previousGui.open();
+        } else {
+            super.close();
         }
-        super.onClose();
     }
 
     @Override
     public TradeShopBlockEntity getBE() {
         return this.be;
-    }
-
-    @Override
-    public void setIgnore(boolean val) {
-        this.ignore = val;
     }
 }

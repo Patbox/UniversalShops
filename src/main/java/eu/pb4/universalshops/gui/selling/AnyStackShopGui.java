@@ -5,6 +5,7 @@ import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.universalshops.gui.BaseShopGui;
+import eu.pb4.universalshops.gui.GuiBackground;
 import eu.pb4.universalshops.gui.GuiElements;
 import eu.pb4.universalshops.other.USUtil;
 import eu.pb4.universalshops.other.TextUtil;
@@ -29,12 +30,14 @@ public class AnyStackShopGui extends BaseShopGui {
     private int page;
     private int lastBought;
 
-    public AnyStackShopGui(ServerPlayerEntity player, TradeShopBlockEntity blockEntity, Runnable onClose) {
-        super(ScreenHandlerType.GENERIC_9X6, player, blockEntity, onClose);
+    public AnyStackShopGui(ServerPlayerEntity player, TradeShopBlockEntity blockEntity) {
+        super(ScreenHandlerType.GENERIC_9X6, player, blockEntity, GuiBackground.TAKE_ANY);
 
-        for (int i = 0; i < 3; i++) {
-            for (int i2 = 0; i2 < 6; i2++) {
-                this.setSlot(i + i2 * 9, GuiElements.FILLER);
+        if (!hasTexture()) {
+            for (int i = 0; i < 3; i++) {
+                for (int i2 = 0; i2 < 6; i2++) {
+                    this.setSlot(i + i2 * 9, GuiElements.FILLER);
+                }
             }
         }
 
@@ -78,9 +81,11 @@ public class AnyStackShopGui extends BaseShopGui {
 
     private void updateValueDisplays() {
         if (this.be.isOwner(this.player)) {
-            this.setSlot(4 * 9, this.be.priceHandler.getAccessElement());
+            var x = this.be.priceHandler.getAccessElement();
+            this.setSlot(4 * 9, hasTexture() && GuiElements.FILLER == x ? GuiElement.EMPTY : x);
         }
-        this.setSlot(1 * 9, this.be.priceHandler.getUserElement());
+        var x = this.be.priceHandler.getUserElement();
+        this.setSlot(1 * 9, hasTexture() && GuiElements.FILLER == x ? GuiElement.EMPTY : x);
 
         {
             var canBuy = maxStockCount > 0;
@@ -108,17 +113,6 @@ public class AnyStackShopGui extends BaseShopGui {
                     Text.empty(),
                     TextUtil.gui("max_stock_left", TextUtil.number(maxStockCount).formatted(Formatting.WHITE)).formatted(Formatting.YELLOW)
                     )));
-        }
-
-        {
-            var hasStock = stockCount > 0;
-
-            this.setSlot(0 * 9 + 1, GuiElements.itemMarker(Text.empty(), List.of(
-                    Text.empty(),
-                    TextUtil.gui("stock_left", TextUtil.number(stockCount).formatted(Formatting.WHITE)).formatted(Formatting.YELLOW),
-                    Text.empty(),
-                    hasStock ? TextUtil.gui("click_to_buy").formatted(Formatting.GREEN) : TextUtil.gui("out_of_stock").formatted(Formatting.RED)
-            )));
         }
 
         this.updateItems();

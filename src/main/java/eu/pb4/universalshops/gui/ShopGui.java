@@ -11,7 +11,7 @@ public interface ShopGui extends ExtraGui {
 
     default void openSettings() {
         this.close(true);
-        new ShopSettingsGui(this.getPlayer(), this.getBE(), () -> this.getBE().openGui(this.getPlayer()));
+        new ShopSettingsGui(this.getPlayer(), this.getBE());
     }
 
     default void openCurrencyStorage() {

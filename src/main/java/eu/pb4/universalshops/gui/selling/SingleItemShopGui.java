@@ -13,8 +13,8 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.collection.DefaultedList;
 
 public class SingleItemShopGui extends SingleGenericShopGui {
-    public SingleItemShopGui(ServerPlayerEntity player, TradeShopBlockEntity blockEntity, Runnable onClose) {
-        super(player, blockEntity, onClose);
+    public SingleItemShopGui(ServerPlayerEntity player, TradeShopBlockEntity blockEntity) {
+        super(player, blockEntity);
     }
 
     @Override

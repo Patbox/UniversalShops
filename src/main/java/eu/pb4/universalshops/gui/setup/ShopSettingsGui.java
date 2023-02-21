@@ -2,6 +2,7 @@ package eu.pb4.universalshops.gui.setup;
 
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.universalshops.gui.BaseShopGui;
+import eu.pb4.universalshops.gui.GuiBackground;
 import eu.pb4.universalshops.gui.GuiElements;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
@@ -13,20 +14,21 @@ import net.minecraft.screen.ScreenTexts;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
 
 public class ShopSettingsGui extends BaseShopGui {
-    public ShopSettingsGui(ServerPlayerEntity player, TradeShopBlockEntity be, @Nullable Runnable closeRunnable) {
-        super(ScreenHandlerType.GENERIC_3X3, player, be, closeRunnable);
-        this.setTitle(TextUtil.gui("shop.settings"));
+    public ShopSettingsGui(ServerPlayerEntity player, TradeShopBlockEntity be) {
+        super(ScreenHandlerType.GENERIC_3X3, player, be, GuiBackground.SETTINGS);
+        this.setMainTitle(TextUtil.gui("shop.settings"));
 
-        this.setSlot(1, GuiElements.FILLER);
-        this.setSlot(4, GuiElements.FILLER);
-        this.setSlot(7, GuiElements.FILLER);
+        if (!hasTexture()) {
+            this.setSlot(1, GuiElements.FILLER);
+            this.setSlot(4, GuiElements.FILLER);
+            this.setSlot(7, GuiElements.FILLER);
+        }
         this.setSlot(8, GuiElements.BACK);
 
         this.updateStock();

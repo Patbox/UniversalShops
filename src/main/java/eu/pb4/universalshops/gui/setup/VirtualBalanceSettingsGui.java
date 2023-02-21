@@ -4,6 +4,7 @@ import eu.pb4.common.economy.api.CommonEconomy;
 import eu.pb4.common.economy.api.EconomyCurrency;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.universalshops.gui.BaseShopGui;
+import eu.pb4.universalshops.gui.GuiBackground;
 import eu.pb4.universalshops.gui.GuiElements;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
@@ -24,8 +25,8 @@ public class VirtualBalanceSettingsGui extends BaseShopGui {
     private List<EconomyCurrency> currencies = new ArrayList<>();
     private EconomyCurrency current;
 
-    public VirtualBalanceSettingsGui(ServerPlayerEntity player, TradeShopBlockEntity blockEntity, Controller controller, @Nullable Runnable onClose) {
-        super(ScreenHandlerType.HOPPER, player, blockEntity, onClose);
+    public VirtualBalanceSettingsGui(ServerPlayerEntity player, TradeShopBlockEntity blockEntity, Controller controller) {
+        super(ScreenHandlerType.HOPPER, player, blockEntity, Text.empty());
         this.controller = controller;
         var id = this.controller.getCurrencyId();
         this.current = id != null ? CommonEconomy.getCurrency(player.server, id) : null;
@@ -33,10 +34,12 @@ public class VirtualBalanceSettingsGui extends BaseShopGui {
         this.setSlot(3, GuiElements.FILLER);
         this.setSlot(4, GuiElements.BACK);
         this.setTitle(TextUtil.gui("virtual_balance.settings.title"));
-
-        this.updateDynamic();
-
         this.open();
+    }
+
+    @Override
+    public void beforeOpen() {
+        this.updateDynamic();
     }
 
     private void updateDynamic() {
@@ -91,16 +94,8 @@ public class VirtualBalanceSettingsGui extends BaseShopGui {
                         return;
                     }
                     this.playClickSound();
-                    this.setIgnore(true);
-                    this.close(true);
-                    new VirtualBalanceValueGui(this.player, this.be, this::updateAndOpen);
-                    this.setIgnore(false);
+                    new VirtualBalanceValueGui(this.player, this.be);
                 }));
-    }
-
-    private void updateAndOpen() {
-        this.updateDynamic();
-        this.open();
     }
 
     public interface Controller {

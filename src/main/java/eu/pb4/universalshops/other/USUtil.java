@@ -85,6 +85,9 @@ public class USUtil {
 
             i += k;
         }
+        if (i != 0) {
+            inventory.markDirty();
+        }
 
         return i;
     }

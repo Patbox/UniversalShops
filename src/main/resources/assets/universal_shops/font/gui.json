@@ -1,0 +1,66 @@
+{
+    "providers": [
+        {
+            "type": "space",
+            "advances": {
+                ".": -168,
+                "_": -98,
+                "-": -8
+            }
+        },
+        {
+            "type": "bitmap",
+            "file": "universal_shops:gui/single_item.png",
+            "ascent": 13,
+            "height": 256,
+            "chars": [
+                "0"
+            ]
+        },
+        {
+            "type": "bitmap",
+            "file": "universal_shops:gui/take_any.png",
+            "ascent": 13,
+            "height": 256,
+            "chars": [
+                "1"
+            ]
+        },
+        {
+            "type": "bitmap",
+            "file": "universal_shops:gui/settings.png",
+            "ascent": 13,
+            "height": 256,
+            "chars": [
+                "2"
+            ]
+        },
+        {
+            "type": "bitmap",
+            "file": "universal_shops:gui/item_select.png",
+            "ascent": 13,
+            "height": 256,
+            "chars": [
+                "3"
+            ]
+        },
+        {
+            "type": "bitmap",
+            "file": "universal_shops:gui/selector.png",
+            "ascent": 13,
+            "height": 256,
+            "chars": [
+                "4"
+            ]
+        },
+        {
+            "type": "bitmap",
+            "file": "universal_shops:gui/selector_big.png",
+            "ascent": 13,
+            "height": 256,
+            "chars": [
+                "5"
+            ]
+        }
+    ]
+}

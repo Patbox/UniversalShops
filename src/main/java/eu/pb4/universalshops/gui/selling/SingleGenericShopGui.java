@@ -5,6 +5,7 @@ import eu.pb4.sgui.api.elements.AnimatedGuiElement;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.universalshops.gui.BaseShopGui;
+import eu.pb4.universalshops.gui.GuiBackground;
 import eu.pb4.universalshops.gui.GuiElements;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
@@ -24,11 +25,13 @@ public abstract class SingleGenericShopGui extends BaseShopGui {
     private int maxStockCount;
     private int stockCount;
 
-    public SingleGenericShopGui(ServerPlayerEntity player, TradeShopBlockEntity blockEntity, Runnable onClose) {
-        super(ScreenHandlerType.GENERIC_9X3, player, blockEntity, onClose);
+    public SingleGenericShopGui(ServerPlayerEntity player, TradeShopBlockEntity blockEntity) {
+        super(ScreenHandlerType.GENERIC_9X3, player, blockEntity, GuiBackground.SINGLE_ITEM);
 
-        for (int i = 0; i < this.getSize(); i++) {
-            this.setSlot(i, GuiElements.FILLER);
+        if (!hasTexture()) {
+            for (int i = 0; i < this.getSize(); i++) {
+                this.setSlot(i, GuiElements.FILLER);
+            }
         }
 
         if (blockEntity.isOwner(player)) {
@@ -61,9 +64,13 @@ public abstract class SingleGenericShopGui extends BaseShopGui {
 
     protected void updateValueDisplays() {
         if (this.be.isOwner(this.player)) {
-            this.setSlot(2 * 9, this.be.priceHandler.getAccessElement());
+            var x = this.be.priceHandler.getAccessElement();
+
+            this.setSlot(2 * 9, hasTexture() && GuiElements.FILLER == x ? GuiElement.EMPTY : x);
         }
-        this.setSlot(0 * 9 + 2, this.be.priceHandler.getUserElement());
+        var x = this.be.priceHandler.getUserElement();
+
+        this.setSlot(0 * 9 + 2, hasTexture() && GuiElements.FILLER == x ? GuiElement.EMPTY : x);
 
         {
             var canBuy = maxStockCount > 0;

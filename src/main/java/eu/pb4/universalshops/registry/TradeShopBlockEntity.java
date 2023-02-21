@@ -12,7 +12,6 @@ import eu.pb4.universalshops.other.USUtil;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.trade.PriceHandler;
 import eu.pb4.universalshops.trade.StockHandler;
-import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -190,7 +189,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
 
     public void openGui(ServerPlayerEntity serverPlayer) {
         if (this.isFullySetup()) {
-            this.stockHandler.openTradeGui(serverPlayer, () -> {});
+            this.stockHandler.openTradeGui(serverPlayer);
         } else if (this.isOwner(serverPlayer)) {
             openSettings(serverPlayer);
         } else {
@@ -222,7 +221,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     }
 
     public void openSettings(ServerPlayerEntity player) {
-        new ShopSettingsGui(player, this, null);
+        new ShopSettingsGui(player, this);
     }
 
     public Text getTitle() {

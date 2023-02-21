@@ -1,5 +1,7 @@
 package eu.pb4.universalshops.gui;
 
+import eu.pb4.sgui.api.GuiHelpers;
+import eu.pb4.sgui.api.gui.GuiInterface;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
 import net.minecraft.screen.ScreenHandlerType;
@@ -9,15 +11,16 @@ import org.jetbrains.annotations.Nullable;
 
 public class BaseShopGui extends SimpleGui implements ShopGui {
     public final TradeShopBlockEntity be;
-    private final Runnable onCloseRunnable;
+    private final Text texture;
     private int titleTimer = -1;
     private Text realTitle = Text.empty();
-    private boolean ignore;
+    private final GuiInterface previousGui;
 
-    public BaseShopGui(ScreenHandlerType type, ServerPlayerEntity player, TradeShopBlockEntity blockEntity, @Nullable Runnable onClose) {
+    public BaseShopGui(ScreenHandlerType type, ServerPlayerEntity player, TradeShopBlockEntity blockEntity, Text texture) {
         super(type, player, false);
-        this.onCloseRunnable = onClose;
         this.be = blockEntity;
+        this.texture = texture;
+        this.previousGui = GuiHelpers.getCurrentGui(player);
     }
 
     @Override
@@ -31,36 +34,27 @@ public class BaseShopGui extends SimpleGui implements ShopGui {
 
     public void setTempTitle(Text text) {
         this.titleTimer = 80;
-        this.setTitle(text);
+        this.setTitle(texture(texture).append(text));
     }
 
     public void setMainTitle(Text text) {
-        this.realTitle = text;
+        this.realTitle = texture(texture).append(text);
         if (this.titleTimer < 0) {
-            this.setTitle(text);
+            this.setTitle(this.realTitle);
         }
     }
 
     @Override
     public void close() {
-        this.close(onCloseRunnable != null && !this.ignore);
-    }
-
-    @Override
-    public void onClose() {
-        if (onCloseRunnable != null && !this.ignore) {
-            this.onCloseRunnable.run();
+        if (this.previousGui != null) {
+            this.previousGui.open();
+        } else {
+            super.close();
         }
-        super.onClose();
     }
 
     @Override
     public TradeShopBlockEntity getBE() {
         return this.be;
-    }
-
-    @Override
-    public void setIgnore(boolean val) {
-        this.ignore = val;
     }
 }

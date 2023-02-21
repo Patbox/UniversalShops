@@ -7,9 +7,7 @@ import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.sgui.api.gui.GuiInterface;
 import eu.pb4.sgui.api.gui.SimpleGui;
-import eu.pb4.universalshops.gui.CurrencySlot;
-import eu.pb4.universalshops.gui.GuiElements;
-import eu.pb4.universalshops.gui.ShopGui;
+import eu.pb4.universalshops.gui.*;
 import eu.pb4.universalshops.gui.setup.ItemModificatorGui;
 import eu.pb4.universalshops.gui.setup.VirtualBalanceSettingsGui;
 import eu.pb4.universalshops.other.EmptyInventory;
@@ -211,14 +209,16 @@ public abstract class PriceHandler extends GenericHandler {
                 }
             };
 
-            gui.setTitle(TextUtil.gui("shop.currency_storage"));
+            gui.setTitle(ExtraGui.texture(player, GuiBackground.SELECTOR).append(TextUtil.gui("shop.currency_storage")));
 
             for (int i = 0; i < this.currencyInventory.size(); i++) {
                 gui.setSlotRedirect(i, new CurrencySlot(this.currencyInventory, i));
             }
 
-            for (int i = 0; i < 9; i++) {
-                gui.setSlot(9 * 3 + i, GuiElements.FILLER);
+            if (!ExtraGui.hasTexture(player)) {
+                for (int i = 0; i < 9; i++) {
+                    gui.setSlot(9 * 3 + i, GuiElements.FILLER);
+                }
             }
 
             gui.setSlot(9 * 3 + 8, GuiElements.BACK);
@@ -377,10 +377,7 @@ public abstract class PriceHandler extends GenericHandler {
         private static final GuiElementInterface SETTINGS = new GuiElementBuilder(Items.GREEN_STAINED_GLASS_PANE).setName(TextUtil.text("configure")).setCallback((a, b, c, g) -> {
             if (g instanceof ShopGui gui) {
                 gui.playClickSound();
-                gui.setIgnore(true);
-                gui.close(true);
-                new VirtualBalanceSettingsGui(gui.getPlayer(), gui.getBE(), (VirtualBalanceSettingsGui.Controller) gui.getBE().priceHandler, gui::open);
-                gui.setIgnore(false);
+                new VirtualBalanceSettingsGui(gui.getPlayer(), gui.getBE(), (VirtualBalanceSettingsGui.Controller) gui.getBE().priceHandler);
             }
         }).build();
         @Nullable
@@ -437,6 +434,7 @@ public abstract class PriceHandler extends GenericHandler {
                 if (!admin) {
                     this.storedMoney += this.cost;
                 }
+                this.shop.markDirty();
                 return Result.successful();
             }
 

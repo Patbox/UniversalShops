@@ -2,6 +2,7 @@ package eu.pb4.universalshops.gui;
 
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
+import eu.pb4.universalshops.gui.setup.ShopSettingsGui;
 import eu.pb4.universalshops.other.USUtil;
 import eu.pb4.universalshops.other.TextUtil;
 import net.minecraft.item.ItemStack;
@@ -20,9 +21,16 @@ public class GuiElements {
     public static final GuiElement CURRENCY_INVENTORY = new GuiElementBuilder(Items.CHEST).setName(TextUtil.gui("shop.currency_storage")).setCallback(ShopGui::openCurrencyCallback).build();
     public static final GuiElement BACK = new GuiElementBuilder(Items.STRUCTURE_VOID).setName(ScreenTexts.BACK.copy().formatted(Formatting.WHITE)).setCallback((a, b, c, g) -> {
         USUtil.playUiSound(g.getPlayer(), SoundEvents.UI_BUTTON_CLICK.value());
-        g.close();
+        if (g instanceof ShopSettingsGui shopSettingsGui) {
+            if (shopSettingsGui.be.isFullySetup()) {
+                shopSettingsGui.be.openGui(g.getPlayer());
+            } else {
+                g.close(false);
+            }
+        } else {
+            g.close();
+        }
     }).build();
-
 
     public static final ItemStack HEAD_QUESTION_MARK = new GuiElementBuilder(Items.PLAYER_HEAD).setName(Text.empty()).setSkullOwner(HeadTextures.GUI_QUESTION_MARK).asStack();
     public static final ItemStack MINUS = new GuiElementBuilder(Items.PLAYER_HEAD).setName(Text.empty()).setSkullOwner(HeadTextures.GUI_MINUS).asStack();
@@ -68,4 +76,5 @@ public class GuiElements {
                 .build();
 
     }
+
 }

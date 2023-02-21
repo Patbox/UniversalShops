@@ -9,6 +9,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Property;
@@ -115,7 +116,7 @@ public class TradeShopBlock extends BlockWithEntity implements PolymerHeadBlock,
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return this::tick;
+        return type == USRegistry.BLOCK_ENTITY_TYPE && world instanceof ServerWorld ? this::tick : null;
     }
 
     private <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
