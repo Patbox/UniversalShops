@@ -15,8 +15,6 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 

@@ -106,7 +106,7 @@ public class SelectItemGui extends SimpleGui implements ExtraGui {
 
         for (var group : ItemGroups.getGroups()) {
             if (group.getType() == ItemGroup.Type.CATEGORY) {
-                var contents = ((ItemGroupExtra) group).polymer$getContentsWith(server.getOverworld().getEnabledFeatures(), false);
+                var contents = PolymerItemGroupUtils.getContentsFor(group, server.getRegistryManager().toImmutable(), server.getOverworld().getEnabledFeatures(), false);
 
                 if (contents.main().size() > 0) {
                     ITEM_GROUP_ITEMS.put(group, new ArrayList<>(contents.main()));
@@ -117,7 +117,7 @@ public class SelectItemGui extends SimpleGui implements ExtraGui {
         }
 
         for (var group : PolymerItemGroupUtils.REGISTRY) {
-            var contents = ((ItemGroupExtra) group).polymer$getContentsWith(server.getOverworld().getEnabledFeatures(), false);
+            var contents = PolymerItemGroupUtils.getContentsFor(group, server.getRegistryManager().toImmutable(), server.getOverworld().getEnabledFeatures(), false);
 
             if (contents.main().size() > 0) {
                 ITEM_GROUP_ITEMS.put(group, new ArrayList<>(contents.main()));
