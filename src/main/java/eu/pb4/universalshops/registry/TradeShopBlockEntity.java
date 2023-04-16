@@ -62,6 +62,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
         this.priceHandler.writeNbt(nbt);
         this.stockHandler.writeNbt(nbt);
         nbt.putBoolean("AllowHoppers", this.allowHoppers);
+        nbt.putString("HologramMode", this.hologramMode.name());
     }
 
     @Override
