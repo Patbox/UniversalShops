@@ -43,7 +43,9 @@ public class VirtualBalanceValueGui extends AnvilInputGui implements ShopGui {
             }
             this.valid = true;
         } catch (Throwable e) {
-            if (!(e isntanceof NumberFormatException)) e.printStackTrace();
+            if (!(e instanceof NumberFormatException)) {
+                e.printStackTrace();
+            }
 
             if (this.valid) {
                 this.setTitle(TextUtil.gui("virtual_balance.cost.invalid_input").formatted(Formatting.RED));
