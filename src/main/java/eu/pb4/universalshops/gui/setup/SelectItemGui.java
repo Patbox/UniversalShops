@@ -83,7 +83,7 @@ public class SelectItemGui extends SimpleGui implements ExtraGui {
     }
 
     private void setStack(int i, ClickType type, SlotActionType slotActionType) {
-        this.holder.setItemStack(this.currentItems.get(i + this.page * 9 * 5));
+        this.holder.setItemStack(this.currentItems.get(i + this.page * 9 * 5).copy());
         this.playClickSound();
         this.close();
     }

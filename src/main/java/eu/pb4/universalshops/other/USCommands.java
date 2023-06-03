@@ -42,7 +42,7 @@ public class USCommands {
 
     private static int about(CommandContext<ServerCommandSource> context) {
         for (var text : context.getSource().getEntity() instanceof ServerPlayerEntity ? GenericModInfo.getAboutFull() : GenericModInfo.getAboutConsole()) {
-            context.getSource().sendFeedback(text, false);
+            context.getSource().sendFeedback(() -> text, false);
         }
 
         return 1;

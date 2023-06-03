@@ -35,14 +35,14 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	modImplementation include('xyz.nucleoid:server-translations-api:2.0.0-beta.2+1.19.4-pre2')
-	modImplementation include('eu.pb4:polymer-core:0.4.10+1.19.4')
-	modImplementation include('eu.pb4:polymer-resource-pack:0.4.10+1.19.4')
-	modImplementation include('eu.pb4:polymer-virtual-entity:0.4.10+1.19.4')
-	modLocalRuntime 'eu.pb4:polymer-autohost:0.4.10+1.19.4'
-	modImplementation include("eu.pb4:sgui:1.2.1+1.19.3")
-	modImplementation include("eu.pb4:placeholder-api:2.1.0+1.19.4")
+	modImplementation include('eu.pb4:polymer-core:0.5.0-rc.1+1.20-rc1')
+	modImplementation include('eu.pb4:polymer-virtual-entity:0.5.0-rc.1+1.20-rc1')
+	modImplementation include('eu.pb4:polymer-resource-pack:0.5.0-rc.1+1.20-rc1')
+	modLocalRuntime 'eu.pb4:polymer-autohost:0.5.0-rc.1+1.20-rc1'
+	modImplementation include("eu.pb4:sgui:1.2.2+1.20")
+	modImplementation include("eu.pb4:placeholder-api:2.1.1+1.20")
 	modImplementation include("eu.pb4:common-protection-api:1.0.0")
-	modImplementation include("eu.pb4:common-economy-api:1.0.0")
+	modImplementation include("eu.pb4:common-economy-api:1.1.1")
 	modImplementation include("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
 
 	// Uncomment the following line to enable the deprecated Fabric API modules. 

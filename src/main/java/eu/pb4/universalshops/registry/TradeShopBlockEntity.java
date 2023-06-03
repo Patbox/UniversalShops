@@ -31,9 +31,11 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.stream.IntStream;
@@ -56,11 +58,11 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
         this.containerPos = pos.offset(state.get(TradeShopBlock.ATTACHED));
         this.textDisplay.setBillboardMode(DisplayEntity.BillboardMode.CENTER);
         this.textDisplay.setViewRange(0.5f);
-        this.textDisplay.setScale(new Vector3f(0.8f));
-        this.itemDisplay.setBillboardMode(DisplayEntity.BillboardMode.VERTICAL);
+        this.itemDisplay.setBillboardMode(DisplayEntity.BillboardMode.CENTER);
         this.itemDisplay.setModelTransformation(ModelTransformationMode.GUI);
+        this.itemDisplay.setLeftRotation(new Quaternionf().rotateY(MathHelper.PI));
         this.itemDisplay.setViewRange(0.5f);
-        this.itemDisplay.setScale(new Vector3f(0.6f));
+        this.itemDisplay.setScale(new Vector3f(0.6f, 0.6f, 0.01f));
     }
 
     @Override
