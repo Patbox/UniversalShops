@@ -18,6 +18,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class SingleGenericShopGui extends BaseShopGui {
@@ -113,7 +114,8 @@ public abstract class SingleGenericShopGui extends BaseShopGui {
                 try {
                     tooltip = item.getTooltip(this.player, TooltipContext.Default.BASIC);
                 } catch (Throwable e) {
-                    tooltip = List.of(item.getName());
+                    tooltip = new ArrayList<>();
+                    tooltip.add(item.getName());
                 }
 
                 secondStack = new GuiElementBuilder(Items.BARRIER).setName(tooltip.remove(0)).setLore(tooltip).asStack();

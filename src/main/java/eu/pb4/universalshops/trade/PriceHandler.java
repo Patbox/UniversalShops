@@ -177,6 +177,7 @@ public abstract class PriceHandler extends GenericHandler {
         protected SingleItem(PriceHandler.Definition  creator, ItemStack initialValue, TradeShopBlockEntity blockEntity) {
             super(creator, blockEntity);
             this.value = initialValue;
+            this.currencyInventory.addListener(blockEntity);
         }
 
         @Override

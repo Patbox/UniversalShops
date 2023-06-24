@@ -19,6 +19,7 @@ import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.InventoryChangedListener;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -40,7 +41,7 @@ import org.joml.Vector3f;
 
 import java.util.stream.IntStream;
 
-public class TradeShopBlockEntity extends BlockEntity implements RemappedInventory, SidedInventory {
+public class TradeShopBlockEntity extends BlockEntity implements RemappedInventory, SidedInventory, InventoryChangedListener {
     private final TextDisplayElement textDisplay = new TextDisplayElement();
     private final ItemDisplayElement itemDisplay = new ItemDisplayElement();
     @Nullable
@@ -283,6 +284,11 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     @Override
     public boolean canExtract(int slot, ItemStack stack, Direction dir) {
         return this.allowHoppers;
+    }
+
+    @Override
+    public void onInventoryChanged(Inventory sender) {
+        this.markDirty();
     }
 
     public enum HologramMode {
