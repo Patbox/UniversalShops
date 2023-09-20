@@ -1,24 +1,25 @@
 package eu.pb4.universalshops;
 
 import com.mojang.logging.LogUtils;
-import eu.pb4.polymer.common.api.PolymerCommonUtils;
-import eu.pb4.polymer.networking.api.PolymerServerNetworking;
 import eu.pb4.polymer.networking.api.client.PolymerClientNetworking;
+import eu.pb4.polymer.networking.api.server.PolymerServerNetworking;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.universalshops.gui.setup.SelectItemGui;
 import eu.pb4.universalshops.other.USCommands;
 import eu.pb4.universalshops.registry.USRegistry;
 import eu.pb4.universalshops.trade.PriceHandler;
 import eu.pb4.universalshops.trade.StockHandler;
+import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.nbt.NbtInt;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 
-public class UniversalShopsMod implements ModInitializer {
+public class UniversalShopsMod implements ModInitializer, ClientModInitializer {
     public static final String MOD_ID = "universal_shops";
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final boolean IS_DEV = FabricLoader.getInstance().isDevelopmentEnvironment();
@@ -35,13 +36,16 @@ public class UniversalShopsMod implements ModInitializer {
         USRegistry.register();
         PriceHandler.init();
         StockHandler.init();
-        ServerLifecycleEvents.SERVER_STARTED.register(server -> SelectItemGui.updateCachedItems(server));
+        ServerLifecycleEvents.SERVER_STARTED.register(SelectItemGui::updateCachedItems);
         CommandRegistrationCallback.EVENT.register(USCommands::register);
-
-        PolymerServerNetworking.registerSendPacket(HELLO_PACKET, 0);
 
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
             PolymerResourcePackUtils.addModAssets(MOD_ID);
         }
+    }
+
+    @Override
+    public void onInitializeClient() {
+        PolymerClientNetworking.setClientMetadata(HELLO_PACKET, NbtInt.of(1));
     }
 }

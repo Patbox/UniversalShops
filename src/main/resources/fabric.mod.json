@@ -19,6 +19,9 @@
   "entrypoints": {
     "main": [
       "eu.pb4.universalshops.UniversalShopsMod"
+    ],
+    "client": [
+      "eu.pb4.universalshops.UniversalShopsMod"
     ]
   },
   "mixins": [

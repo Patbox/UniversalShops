@@ -21,20 +21,22 @@ import java.util.Locale;
 
 public class ShopSettingsGui extends BaseShopGui {
     public ShopSettingsGui(ServerPlayerEntity player, TradeShopBlockEntity be) {
-        super(ScreenHandlerType.GENERIC_3X3, player, be, GuiBackground.SETTINGS);
+        super(ScreenHandlerType.GENERIC_9X3, player, be, GuiBackground.SETTINGS);
         this.setMainTitle(TextUtil.gui("shop.settings"));
 
-        if (!hasTexture()) {
-            this.setSlot(1, GuiElements.FILLER);
-            this.setSlot(4, GuiElements.FILLER);
-            this.setSlot(7, GuiElements.FILLER);
-        }
-        this.setSlot(8, GuiElements.BACK);
+        this.setSlot(9 * 2 + 3 + 2, GuiElements.BACK);
 
         this.updateStock();
         this.updatePrice();
         this.updateHologram();
         this.updateHopper();
+
+        if (!hasTexture()) {
+            while (this.getFirstEmptySlot() != -1) {
+                this.addSlot(GuiElements.FILLER);
+            }
+        }
+
         this.open();
     }
 
@@ -62,11 +64,11 @@ public class ShopSettingsGui extends BaseShopGui {
             x.glow();
         }
 
-        this.setSlot(7, x);
+        this.setSlot(9 * 2 + 3 + 1, x);
     }
 
     private void updateHologram() {
-        this.setSlot(6, new GuiElementBuilder(Items.NAME_TAG)
+        this.setSlot(9 * 2 + 3, new GuiElementBuilder(Items.NAME_TAG)
                 .setName(TextUtil.gui("setup.hologram", TextUtil.of("hologram_type", this.be.hologramMode.name().toLowerCase(Locale.ROOT)).formatted(Formatting.YELLOW)).formatted(Formatting.WHITE))
                 .addLoreLine(Text.empty())
                 .addLoreLine(Text.empty()
@@ -100,7 +102,7 @@ public class ShopSettingsGui extends BaseShopGui {
             b.addLoreLine(TextUtil.gui("setup.cant_change_pricehandler.2").formatted(Formatting.RED));
         }
 
-        this.setSlot(0, b
+        this.setSlot(3, b
                 .addLoreLine(Text.empty())
                 .addLoreLine(Text.empty()
                         .append(Text.literal("» ").formatted(Formatting.DARK_GRAY))
@@ -136,7 +138,7 @@ public class ShopSettingsGui extends BaseShopGui {
                     this.markDirty();
                 }));
 
-        this.setSlot(2, handler.getSetupElement());
+        this.setSlot(3 + 2, handler.getSetupElement());
     }
 
     private void updateStock() {
@@ -149,7 +151,7 @@ public class ShopSettingsGui extends BaseShopGui {
             b.addLoreLine(TextUtil.gui("setup.cant_change_pricehandler.2").formatted(Formatting.RED));
         }
 
-        this.setSlot(3, b
+        this.setSlot(9 + 3, b
                 .addLoreLine(Text.empty())
                 .addLoreLine(Text.empty()
                         .append(Text.literal("» ").formatted(Formatting.DARK_GRAY))
@@ -185,6 +187,6 @@ public class ShopSettingsGui extends BaseShopGui {
                     this.markDirty();
                 })
         );
-        this.setSlot(5, handler.getSetupElement());
+        this.setSlot(9 + 3 + 2, handler.getSetupElement());
     }
 }

@@ -474,6 +474,7 @@ public abstract class PriceHandler extends GenericHandler {
 
                         if (ac.increaseBalance(this.storedMoney).isSuccessful()) {
                             this.storedMoney = 0;
+                            this.shop.markDirty();
                         }
                     })
                     .build();
