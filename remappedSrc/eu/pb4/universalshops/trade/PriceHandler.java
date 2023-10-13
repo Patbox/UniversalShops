@@ -1,8 +1,11 @@
 package eu.pb4.universalshops.trade;
 
+import I;
+import Z;
 import eu.pb4.common.economy.api.CommonEconomy;
 import eu.pb4.common.economy.api.EconomyAccount;
 import eu.pb4.common.economy.api.EconomyCurrency;
+import eu.pb4.common.economy.api.EconomyTransaction;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.sgui.api.gui.GuiInterface;
@@ -34,8 +37,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public abstract class PriceHandler extends GenericHandler {
-    public static final Map<String, Definition> TYPES_MAP = new HashMap<>();
-    public static final List<Definition> TYPES = new ArrayList<>();
+    public static final Map<String, eu.pb4.universalshops.trade.PriceHandler.Definition> TYPES_MAP = new HashMap<>();
+    public static final List<eu.pb4.universalshops.trade.PriceHandler.Definition> TYPES = new ArrayList<>();
 
     protected PriceHandler(PriceHandler.Definition  definition, TradeShopBlockEntity blockEntity) {
         super(definition, blockEntity);

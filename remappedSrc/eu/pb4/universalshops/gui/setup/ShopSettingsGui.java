@@ -1,5 +1,6 @@
 package eu.pb4.universalshops.gui.setup;
 
+import I;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.universalshops.gui.BaseShopGui;
 import eu.pb4.universalshops.gui.GuiBackground;
@@ -7,6 +8,7 @@ import eu.pb4.universalshops.gui.GuiElements;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
 import eu.pb4.universalshops.trade.PriceHandler;
+import eu.pb4.universalshops.trade.PriceHandler.Definition;
 import eu.pb4.universalshops.trade.StockHandler;
 import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandlerType;
