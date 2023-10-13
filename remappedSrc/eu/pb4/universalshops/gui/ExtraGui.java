@@ -1,12 +1,11 @@
 package eu.pb4.universalshops.gui;
 
-import eu.pb4.polymer.common.api.PolymerCommonUtils;
-import eu.pb4.polymer.networking.api.PolymerServerNetworking;
+import eu.pb4.polymer.networking.api.server.PolymerServerNetworking;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.sgui.api.gui.SlotGuiInterface;
 import eu.pb4.universalshops.UniversalShopsMod;
 import eu.pb4.universalshops.other.USUtil;
-// import net.minecraft.nbt.NbtInt;
+import net.minecraft.nbt.NbtInt;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
@@ -41,7 +40,7 @@ public interface ExtraGui extends SlotGuiInterface {
     }
 
     static boolean hasTexture(ServerPlayerEntity player) {
-        return PolymerResourcePackUtils.hasPack(player) || PolymerServerNetworking.getSupportedVersion(player.networkHandler, UniversalShopsMod.HELLO_PACKET) != -1;
+        return PolymerResourcePackUtils.hasPack(player) || PolymerServerNetworking.getMetadata(player.networkHandler, UniversalShopsMod.HELLO_PACKET, NbtInt.TYPE) != null;
     }
 
     static MutableText texture(ServerPlayerEntity player, Text possibleTexture) {
