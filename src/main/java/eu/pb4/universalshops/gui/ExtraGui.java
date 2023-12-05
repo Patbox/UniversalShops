@@ -40,7 +40,7 @@ public interface ExtraGui extends SlotGuiInterface {
     }
 
     static boolean hasTexture(ServerPlayerEntity player) {
-        return PolymerResourcePackUtils.hasPack(player) || PolymerServerNetworking.getMetadata(player.networkHandler, UniversalShopsMod.HELLO_PACKET, NbtInt.TYPE) != null;
+        return PolymerResourcePackUtils.hasMainPack(player) || PolymerServerNetworking.getMetadata(player.networkHandler, UniversalShopsMod.HELLO_PACKET, NbtInt.TYPE) != null;
     }
 
     static MutableText texture(ServerPlayerEntity player, Text possibleTexture) {

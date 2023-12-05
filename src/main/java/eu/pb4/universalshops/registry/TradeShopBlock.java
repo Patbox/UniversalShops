@@ -1,5 +1,8 @@
 package eu.pb4.universalshops.registry;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polymer.core.api.block.PolymerHeadBlock;
 import net.fabricmc.fabric.api.block.BlockAttackInteractionAware;
 import net.minecraft.block.*;
@@ -26,6 +29,11 @@ import org.jetbrains.annotations.Nullable;
 public class TradeShopBlock extends BlockWithEntity implements PolymerHeadBlock, BlockAttackInteractionAware {
     public static Property<Direction> ATTACHED = EnumProperty.of("attachment", Direction.class, (x) -> x != Direction.UP);
     public final boolean isAdmin;
+
+    public static final MapCodec<TradeShopBlock> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            Codec.BOOL.fieldOf("is_admin").forGetter(x -> x.isAdmin),
+            createSettingsCodec()
+    ).apply(instance, TradeShopBlock::new));
 
     protected TradeShopBlock(boolean isAdmin, Settings settings) {
         super(settings);
@@ -130,5 +138,10 @@ public class TradeShopBlock extends BlockWithEntity implements PolymerHeadBlock,
         }
 
         return true;
+    }
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
     }
 }
