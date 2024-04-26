@@ -16,7 +16,7 @@ import net.minecraft.util.Formatting;
 import java.util.List;
 
 public class GuiElements {
-    public static final GuiElement FILLER = new GuiElementBuilder(Items.WHITE_STAINED_GLASS_PANE).setName(Text.empty()).build();
+    public static final GuiElement FILLER = new GuiElementBuilder(Items.WHITE_STAINED_GLASS_PANE).setName(Text.empty()).hideTooltip().build();
     public static final GuiElement SETTINGS = new GuiElementBuilder(Items.REDSTONE).setName(TextUtil.gui("shop.settings")).setCallback(ShopGui::openSettingsCallback).build();
     public static final GuiElement CURRENCY_INVENTORY = new GuiElementBuilder(Items.CHEST).setName(TextUtil.gui("shop.currency_storage")).setCallback(ShopGui::openCurrencyCallback).build();
     public static final GuiElement BACK = new GuiElementBuilder(Items.STRUCTURE_VOID).setName(ScreenTexts.BACK.copy().formatted(Formatting.WHITE)).setCallback((a, b, c, g) -> {

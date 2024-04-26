@@ -8,6 +8,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
@@ -40,9 +41,9 @@ public abstract class GenericHandler {
 
     public abstract boolean isSetup();
 
-    public abstract NbtCompound writeNbt(NbtCompound compound);
+    public abstract NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup);
 
-    protected abstract NbtElement writeValueNbt();
+    protected abstract NbtElement writeValueNbt(RegistryWrapper.WrapperLookup lookup);
 
     public abstract boolean canSwitch();
 
@@ -65,7 +66,7 @@ public abstract class GenericHandler {
             this.icon = icon;
         }
 
-        public abstract T createFromNbt(NbtElement compound, TradeShopBlockEntity blockEntity);
+        public abstract T createFromNbt(NbtElement compound, TradeShopBlockEntity blockEntity, RegistryWrapper.WrapperLookup lookup);
         public abstract T createInitial(TradeShopBlockEntity blockEntity);
 
         public boolean canUse(ServerPlayerEntity player) {

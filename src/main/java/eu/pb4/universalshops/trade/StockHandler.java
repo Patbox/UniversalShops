@@ -13,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -34,18 +35,18 @@ public abstract class StockHandler extends GenericHandler {
 
     public abstract void openTradeGui(ServerPlayerEntity player);
     
-    public final NbtCompound writeNbt(NbtCompound nbt) {
+    public final NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         nbt.putString("StockType", this.definition.type);
-        nbt.put("StockValue", this.writeValueNbt());
+        nbt.put("StockValue", this.writeValueNbt(lookup));
         return nbt;
     }
     
-    public static StockHandler readNbt(NbtCompound nbt, TradeShopBlockEntity blockEntity) {
+    public static StockHandler readNbt(NbtCompound nbt, TradeShopBlockEntity blockEntity, RegistryWrapper.WrapperLookup lookup) {
         var type = nbt.getString("StockType");
 
         var definition = TYPES_MAP.get(type);
 
-        return definition != null ? definition.createFromNbt(nbt.get("StockValue"), blockEntity) : Invalid.DEFINITION.createInitial(blockEntity);
+        return definition != null ? definition.createFromNbt(nbt.get("StockValue"), blockEntity, lookup) : Invalid.DEFINITION.createInitial(blockEntity);
     }
 
     public static void register(StockHandler.Definition   definition) {
@@ -83,7 +84,7 @@ public abstract class StockHandler extends GenericHandler {
     public static final class Invalid extends StockHandler {
         public static final StockHandler.Definition   DEFINITION = new StockHandler.Definition("invalid", TextUtil.text("not_set"), GuiElements.HEAD_QUESTION_MARK) {
             @Override
-            public StockHandler createFromNbt(NbtElement compound, TradeShopBlockEntity blockEntity) {
+            public StockHandler createFromNbt(NbtElement compound, TradeShopBlockEntity blockEntity, RegistryWrapper.WrapperLookup lookup) {
                 return new Invalid(this, blockEntity);
             }
 
@@ -123,7 +124,7 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
-        protected NbtElement writeValueNbt() {
+        protected NbtElement writeValueNbt(RegistryWrapper.WrapperLookup lookup) {
             return new NbtCompound();
         }
 
@@ -141,8 +142,8 @@ public abstract class StockHandler extends GenericHandler {
     public static final class SingleItem extends StockHandler implements ItemModificatorGui.ItemStackHolder {
         public static final StockHandler.Definition   DEFINITION = new StockHandler.Definition  ("single_item", Items.NETHERITE_PICKAXE) {
             @Override
-            public StockHandler createFromNbt(NbtElement compound, TradeShopBlockEntity blockEntity) {
-                return new SingleItem(this, ItemStack.fromNbt((NbtCompound) compound), blockEntity);
+            public StockHandler createFromNbt(NbtElement compound, TradeShopBlockEntity blockEntity, RegistryWrapper.WrapperLookup lookup) {
+                return new SingleItem(this, ItemStack.fromNbtOrEmpty(lookup, (NbtCompound) compound), blockEntity);
             }
 
             @Override
@@ -153,7 +154,7 @@ public abstract class StockHandler extends GenericHandler {
 
         public ItemStack value;
 
-        protected SingleItem(StockHandler.Definition   creator, ItemStack itemStack, TradeShopBlockEntity blockEntity) {
+        protected SingleItem(StockHandler.Definition creator, ItemStack itemStack, TradeShopBlockEntity blockEntity) {
             super(creator, blockEntity);
             this.value = itemStack;
         }
@@ -179,8 +180,8 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
-        protected NbtElement writeValueNbt() {
-            return this.value.writeNbt(new NbtCompound());
+        protected NbtElement writeValueNbt(RegistryWrapper.WrapperLookup lookup) {
+            return this.value.encode(lookup);
         }
 
         @Override
@@ -220,7 +221,7 @@ public abstract class StockHandler extends GenericHandler {
     public static final class SelectedItem extends StockHandler {
         public static final StockHandler.Definition   DEFINITION = new StockHandler.Definition  ("selected_item", Items.POTION) {
             @Override
-            public StockHandler createFromNbt(NbtElement compound, TradeShopBlockEntity blockEntity) {
+            public StockHandler createFromNbt(NbtElement compound, TradeShopBlockEntity blockEntity, RegistryWrapper.WrapperLookup lookup) {
                 return new SelectedItem(this, blockEntity);
             }
 
@@ -280,7 +281,7 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
-        protected NbtElement writeValueNbt() {
+        protected NbtElement writeValueNbt(RegistryWrapper.WrapperLookup lookup) {
             return new NbtCompound();
         }
 

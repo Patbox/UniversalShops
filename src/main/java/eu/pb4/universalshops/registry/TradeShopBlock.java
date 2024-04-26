@@ -79,11 +79,6 @@ public class TradeShopBlock extends BlockWithEntity implements PolymerHeadBlock,
     }
 
     @Override
-    public Block getPolymerBlock(BlockState state) {
-        return Blocks.PLAYER_HEAD;
-    }
-
-    @Override
     public BlockState getPolymerBlockState(BlockState state) {
         var dir = state.get(ATTACHED);
 
@@ -108,17 +103,13 @@ public class TradeShopBlock extends BlockWithEntity implements PolymerHeadBlock,
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (hand == Hand.OFF_HAND) {
-            return ActionResult.FAIL;
-        }
-
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (player instanceof ServerPlayerEntity serverPlayer && world.getBlockEntity(pos) instanceof TradeShopBlockEntity be) {
             be.openGui(serverPlayer);
             return ActionResult.SUCCESS;
         }
 
-        return super.onUse(state, world, pos, player, hand, hit);
+        return super.onUse(state, world, pos, player, hit);
     }
 
     @Nullable

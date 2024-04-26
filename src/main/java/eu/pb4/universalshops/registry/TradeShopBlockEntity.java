@@ -7,10 +7,7 @@ import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.elements.TextDisplayElement;
 import eu.pb4.universalshops.gui.setup.ShopSettingsGui;
-import eu.pb4.universalshops.other.EmptyInventory;
-import eu.pb4.universalshops.other.RemappedInventory;
-import eu.pb4.universalshops.other.TextUtil;
-import eu.pb4.universalshops.other.USUtil;
+import eu.pb4.universalshops.other.*;
 import eu.pb4.universalshops.trade.PriceHandler;
 import eu.pb4.universalshops.trade.StockHandler;
 import net.minecraft.block.BlockState;
@@ -24,7 +21,7 @@ import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtHelper;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Style;
@@ -34,7 +31,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -67,28 +63,28 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         if (this.containerPos != null) {
-            nbt.put("ItemContainerPos", NbtHelper.fromBlockPos(this.containerPos));
+            nbt.put("ItemContainerPos", LegacyNbtHelper.fromBlockPos(this.containerPos));
         }
         if (this.owner != null) {
-            nbt.put("Owner", NbtHelper.writeGameProfile(new NbtCompound(), this.owner));
+            nbt.put("Owner", LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
         }
 
-        this.priceHandler.writeNbt(nbt);
-        this.stockHandler.writeNbt(nbt);
+        this.priceHandler.writeNbt(nbt, lookup);
+        this.stockHandler.writeNbt(nbt, lookup);
         nbt.putBoolean("AllowHoppers", this.allowHoppers);
         nbt.putString("HologramMode", this.hologramMode.name());
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         if (nbt.contains("ItemContainerPos")) {
-            this.containerPos = NbtHelper.toBlockPos(nbt.getCompound("ItemContainerPos"));
+            this.containerPos = LegacyNbtHelper.toBlockPos(nbt.getCompound("ItemContainerPos"));
         }
 
         if (nbt.contains("Owner")) {
-            this.owner = NbtHelper.toGameProfile(nbt.getCompound("Owner"));
+            this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompound("Owner"));
         }
         try {
             this.hologramMode = HologramMode.valueOf(nbt.getString("HologramMode"));
@@ -97,12 +93,12 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
         }
 
         try {
-            this.priceHandler = PriceHandler.readNbt(nbt, this);
+            this.priceHandler = PriceHandler.readNbt(nbt, this, lookup);
         } catch (Throwable e) {
             e.printStackTrace();
         }
         try {
-            this.stockHandler = StockHandler.readNbt(nbt, this);
+            this.stockHandler = StockHandler.readNbt(nbt, this, lookup);
         } catch (Throwable e) {
             e.printStackTrace();
 

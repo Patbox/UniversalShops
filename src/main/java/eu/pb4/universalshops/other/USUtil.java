@@ -31,42 +31,7 @@ public class USUtil {
     public static final Predicate<ItemStack> ALWAYS_ALLOW = (x) -> true;
 
     public static boolean areStacksMatching(ItemStack a, ItemStack b) {
-        if (a.getItem() != b.getItem() || a.hasNbt() != b.hasNbt() || a.hasEnchantments() != b.hasEnchantments()) {
-            return false;
-        }
-
-        if (!a.hasNbt()) {
-            return true;
-        }
-
-
-        if (a.getDamage() == b.getDamage() && a.hasEnchantments() && !EnchantmentHelper.get(a).equals(EnchantmentHelper.get(b))) {
-            return false;
-        }
-
-        {
-            var storedEnchA = EnchantedBookItem.getEnchantmentNbt(a);
-            var storedEnchB = EnchantedBookItem.getEnchantmentNbt(b);
-
-            if (storedEnchA.size() != storedEnchB.size() || !EnchantmentHelper.fromNbt(storedEnchA).equals(EnchantmentHelper.fromNbt(storedEnchB))) {
-                return false;
-            }
-        }
-
-
-        var aNbt = a.getNbt().copy();
-        var bNbt = b.getNbt().copy();
-
-        clearCheckedNbt(aNbt);
-        clearCheckedNbt(bNbt);
-
-        return aNbt.equals(bNbt);
-    }
-
-    private static void clearCheckedNbt(NbtCompound nbt) {
-        nbt.remove(ItemStack.ENCHANTMENTS_KEY);
-        nbt.remove(ItemStack.DAMAGE_KEY);
-        nbt.remove(EnchantedBookItem.STORED_ENCHANTMENTS_KEY);
+        return ItemStack.areItemsAndComponentsEqual(a, b);
     }
 
     public static int transfer(Inventory inventory, Predicate<ItemStack> shouldRemove, int maxCount, boolean dryRun, Predicate<ItemStack> consumer) {
@@ -174,7 +139,7 @@ public class USUtil {
         // Insert to existing
         for(int i = 0; i < size; ++i) {
             var itemStack = getter.apply(i);
-            if (ItemStack.canCombine(itemStack, stackCopy)) {
+            if (ItemStack.areItemsAndComponentsEqual(itemStack, stackCopy)) {
                 transfer(maxStackSize, stackCopy, itemStack);
                 if (stackCopy.isEmpty()) {
                     break;
@@ -214,7 +179,7 @@ public class USUtil {
                 handler.setCursorStack(stack.copy());
                 stack.setCount(0);
                 return true;
-            } else if (ItemStack.canCombine(stack, handler.getCursorStack())) {
+            } else if (ItemStack.areItemsAndComponentsEqual(stack, handler.getCursorStack())) {
                 var count = stack.getCount() + handler.getCursorStack().getCount();
 
                 if (count > handler.getCursorStack().getMaxCount()) {
@@ -231,7 +196,7 @@ public class USUtil {
     }
 
     public static void playUiSound(ServerPlayerEntity player, SoundEvent event) {
-        player.playSound(event, SoundCategory.MASTER, 0.8f, 1);
+        player.playSoundToPlayer(event, SoundCategory.MASTER, 0.8f, 1);
     }
 
     public static boolean canInsert(Inventory chest, ItemStack value, int count) {
@@ -251,7 +216,7 @@ public class USUtil {
                 return true;
             }
 
-            if (ItemStack.canCombine(stack, value)) {
+            if (ItemStack.areItemsAndComponentsEqual(stack, value)) {
                 count -= (stack.getMaxCount() - stack.getCount());
 
                 if (count <= 0) {

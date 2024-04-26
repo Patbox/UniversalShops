@@ -10,8 +10,9 @@ import eu.pb4.universalshops.gui.GuiElements;
 import eu.pb4.universalshops.other.USUtil;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
-import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.item.TooltipType;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandlerType;
@@ -96,7 +97,7 @@ public class AnyStackShopGui extends BaseShopGui {
                 List<Text> tooltip;
 
                 try {
-                    tooltip = item.getTooltip(this.player, TooltipContext.Default.BASIC);
+                    tooltip = item.getTooltip(Item.TooltipContext.create(this.player.getWorld()), this.player, TooltipType.Default.BASIC);
                 } catch (Throwable e) {
                     tooltip = List.of(item.getName());
                 }

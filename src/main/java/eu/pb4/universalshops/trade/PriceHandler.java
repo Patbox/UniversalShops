@@ -14,6 +14,7 @@ import eu.pb4.universalshops.other.EmptyInventory;
 import eu.pb4.universalshops.other.USUtil;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
@@ -22,6 +23,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.HoverEvent;
@@ -46,18 +48,18 @@ public abstract class PriceHandler extends GenericHandler {
 
     public abstract Result payFor(ServerPlayerEntity player, boolean canTake);
 
-    public final NbtCompound writeNbt(NbtCompound nbt) {
+    public final NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         nbt.putString("PriceType", this.definition.type);
-        nbt.put("PriceValue", writeValueNbt());
+        nbt.put("PriceValue", writeValueNbt(lookup));
         return nbt;
     }
 
-    public static PriceHandler readNbt(NbtCompound nbt, TradeShopBlockEntity blockEntity) {
+    public static PriceHandler readNbt(NbtCompound nbt, TradeShopBlockEntity blockEntity, RegistryWrapper.WrapperLookup lookup) {
         var type = nbt.getString("PriceType");
 
         var definition = TYPES_MAP.get(type);
 
-        return definition != null ? definition.createFromNbt(nbt.get("PriceValue"), blockEntity) : Invalid.DEFINITION.createInitial(blockEntity);
+        return definition != null ? definition.createFromNbt(nbt.get("PriceValue"), blockEntity, lookup) : Invalid.DEFINITION.createInitial(blockEntity);
     }
 
     public static void register(PriceHandler.Definition  definition) {
@@ -103,7 +105,7 @@ public abstract class PriceHandler extends GenericHandler {
     public static final class Invalid extends PriceHandler {
         public static final PriceHandler.Definition DEFINITION = new PriceHandler.Definition("invalid", TextUtil.text("not_set"), GuiElements.HEAD_QUESTION_MARK) {
             @Override
-            public PriceHandler createFromNbt(NbtElement element, TradeShopBlockEntity blockEntity) {
+            public PriceHandler createFromNbt(NbtElement element, TradeShopBlockEntity blockEntity, RegistryWrapper.WrapperLookup lookup) {
                 return new Invalid(this, blockEntity);
             }
 
@@ -138,7 +140,7 @@ public abstract class PriceHandler extends GenericHandler {
         }
 
         @Override
-        protected NbtElement writeValueNbt() {
+        protected NbtElement writeValueNbt(RegistryWrapper.WrapperLookup lookup) {
             return NbtByte.of(false);
         }
 
@@ -156,11 +158,11 @@ public abstract class PriceHandler extends GenericHandler {
     public static final class SingleItem extends PriceHandler implements ItemModificatorGui.ItemStackHolder {
         public static final PriceHandler.Definition DEFINITION = new PriceHandler.Definition("items", Items.DIAMOND) {
             @Override
-            public PriceHandler createFromNbt(NbtElement element, TradeShopBlockEntity blockEntity) {
+            public PriceHandler createFromNbt(NbtElement element, TradeShopBlockEntity blockEntity, RegistryWrapper.WrapperLookup lookup) {
                 var nbt = (NbtCompound) element;
-                var x = new SingleItem(this, ItemStack.fromNbt(nbt.getCompound("Value")), blockEntity);
+                var x = new SingleItem(this, ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("Value")), blockEntity);
 
-                x.currencyInventory.readNbtList(nbt.getList("CurrencyContainer", NbtElement.COMPOUND_TYPE));
+                x.currencyInventory.readNbtList(nbt.getList("CurrencyContainer", NbtElement.COMPOUND_TYPE), lookup);
                 return x;
             }
 
@@ -282,10 +284,10 @@ public abstract class PriceHandler extends GenericHandler {
         }
 
         @Override
-        protected NbtElement writeValueNbt() {
+        protected NbtElement writeValueNbt(RegistryWrapper.WrapperLookup lookup) {
             var nbt = new NbtCompound();
-            nbt.put("Value", this.value.writeNbt(new NbtCompound()));
-            nbt.put("CurrencyContainer", this.currencyInventory.toNbtList());
+            nbt.put("Value", this.value.encode(lookup));
+            nbt.put("CurrencyContainer", this.currencyInventory.toNbtList(lookup));
             return nbt;
         }
 
@@ -303,7 +305,7 @@ public abstract class PriceHandler extends GenericHandler {
     public static final class Free extends PriceHandler {
         public static final PriceHandler.Definition DEFINITION = new PriceHandler.Definition("free", Items.OXEYE_DAISY) {
             @Override
-            public PriceHandler createFromNbt(NbtElement nbt, TradeShopBlockEntity blockEntity) {
+            public PriceHandler createFromNbt(NbtElement nbt, TradeShopBlockEntity blockEntity, RegistryWrapper.WrapperLookup lookup) {
                 return new Free(this, blockEntity);
 
             }
@@ -341,7 +343,7 @@ public abstract class PriceHandler extends GenericHandler {
         @Override
         public ItemStack icon() {
             var i = DEFINITION.icon.copy();
-            i.setCustomName(this.getText().copy().setStyle(Style.EMPTY.withItalic(false)));
+            i.set(DataComponentTypes.ITEM_NAME, this.getText());
             return i;
         }
 
@@ -351,7 +353,7 @@ public abstract class PriceHandler extends GenericHandler {
         }
 
         @Override
-        protected NbtElement writeValueNbt() {
+        protected NbtElement writeValueNbt(RegistryWrapper.WrapperLookup lookup) {
             return NbtByte.of(false);
         }
     }
@@ -359,7 +361,7 @@ public abstract class PriceHandler extends GenericHandler {
     public static final class VirtualBalance extends PriceHandler implements VirtualBalanceSettingsGui.Controller {
         public static final PriceHandler.Definition DEFINITION = new PriceHandler.Definition("virtual_balance", Items.SUNFLOWER) {
             @Override
-            public PriceHandler createFromNbt(NbtElement nbte, TradeShopBlockEntity blockEntity) {
+            public PriceHandler createFromNbt(NbtElement nbte, TradeShopBlockEntity blockEntity, RegistryWrapper.WrapperLookup lookup) {
                 var nbt = (NbtCompound) nbte;
                 return new VirtualBalance(this, Identifier.tryParse(nbt.getString("Currency")), nbt.getLong("Value"), nbt.getLong("Stored"), blockEntity);
 
@@ -372,7 +374,7 @@ public abstract class PriceHandler extends GenericHandler {
 
             @Override
             public boolean canUse(ServerPlayerEntity player) {
-                return CommonEconomy.getCurrencies(player.server).size() > 0;
+                return !CommonEconomy.getCurrencies(player.server).isEmpty();
             }
         };
         private static final GuiElementInterface SETTINGS = new GuiElementBuilder(Items.GREEN_STAINED_GLASS_PANE).setName(TextUtil.text("configure")).setCallback((a, b, c, g) -> {
@@ -449,7 +451,7 @@ public abstract class PriceHandler extends GenericHandler {
             if (ac != null) {
                 var icon = ac.icon();
 
-                icon.setCustomName(ac.formatValueText(this.cost, false).copy().setStyle(Style.EMPTY.withItalic(false)));
+                icon.set(DataComponentTypes.ITEM_NAME, ac.formatValueText(this.cost, false));
 
                 return icon;
             }
@@ -505,7 +507,7 @@ public abstract class PriceHandler extends GenericHandler {
                                     .append(Text.literal("   ").formatted(Formatting.DARK_GRAY))
                                     .append(TextUtil.gui("setup.click_to_change_mode.2")).formatted(Formatting.GRAY)
                             )
-                            .hideFlags()
+                            .hideDefaultTooltip()
                             .asStack();
                 }
 
@@ -553,7 +555,7 @@ public abstract class PriceHandler extends GenericHandler {
         }
 
         @Override
-        protected NbtElement writeValueNbt() {
+        protected NbtElement writeValueNbt(RegistryWrapper.WrapperLookup lookup) {
             var nbt = new NbtCompound();
             if (this.currency != null) {
                 nbt.putString("Currency", this.currency.toString());
