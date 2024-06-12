@@ -171,7 +171,7 @@ public class SelectItemGui extends SimpleGui implements ExtraGui {
 
                     var group = ITEM_GROUPS.get(i);
 
-                    var b = GuiElementBuilder.from(group.getIcon().copy()).setName(group.getDisplayName()).hideFlags();
+                    var b = GuiElementBuilder.from(group.getIcon().copy()).setName(group.getDisplayName()).hideDefaultTooltip();
 
                     if (group == SelectItemGui.this.currentGroup) {
                         b.glow();

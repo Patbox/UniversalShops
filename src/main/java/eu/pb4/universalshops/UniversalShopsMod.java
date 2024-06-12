@@ -27,7 +27,7 @@ public class UniversalShopsMod implements ModInitializer, ClientModInitializer {
     public static final Identifier HELLO_PACKET = id("hello");
 
     public static Identifier id(String path) {
-        return new Identifier(MOD_ID, path);
+        return Identifier.of(MOD_ID, path);
     }
 
     @Override

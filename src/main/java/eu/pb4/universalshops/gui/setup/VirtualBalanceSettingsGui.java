@@ -45,10 +45,7 @@ public class VirtualBalanceSettingsGui extends BaseShopGui {
     private void updateDynamic() {
         this.currencies.clear();
 
-        for (var ac : CommonEconomy.getCurrencies(this.player.server)) {
-            this.currencies.add(ac);
-        }
-
+        this.currencies.addAll(CommonEconomy.getCurrencies(this.player.server));
 
         var b = GuiElementBuilder.from((this.current == null ? GuiElements.HEAD_QUESTION_MARK : this.current.icon()).copy())
                 .setName(TextUtil.gui("setup.virtual_balance.currency", (this.current == null ? TextUtil.text("not_set") : this.current.name().copy()).formatted(Formatting.YELLOW)).formatted(Formatting.WHITE));
@@ -69,7 +66,7 @@ public class VirtualBalanceSettingsGui extends BaseShopGui {
                         .append(Text.literal("   ").formatted(Formatting.DARK_GRAY))
                         .append(TextUtil.gui("setup.click_to_change_mode.2")).formatted(Formatting.GRAY)
                 )
-                .hideFlags()
+                .hideDefaultTooltip()
                 .setCallback((a, type, c, d) -> {
                     if (!this.be.priceHandler.canSwitch()) {
                         this.playDismissSound();
@@ -87,7 +84,7 @@ public class VirtualBalanceSettingsGui extends BaseShopGui {
 
         this.setSlot(2, new GuiElementBuilder(Items.SUNFLOWER)
                 .setName(TextUtil.gui("setup.virtual_balance.value", (this.current == null ? TextUtil.text("not_set") : this.current.formatValueText(((PriceHandler.VirtualBalance) this.be.priceHandler).cost, true).copy()).formatted(Formatting.YELLOW)).formatted(Formatting.WHITE))
-                .hideFlags()
+                .hideDefaultTooltip()
                 .setCallback((a, type, c, d) -> {
                     if (this.current == null) {
                         this.playDismissSound();

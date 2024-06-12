@@ -52,7 +52,7 @@ public class ShopSettingsGui extends BaseShopGui {
                         .append(Text.literal("   ").formatted(Formatting.DARK_GRAY))
                         .append(TextUtil.gui("setup.click_to_change_mode.2")).formatted(Formatting.GRAY)
                 )
-                .hideFlags()
+                .hideDefaultTooltip()
                 .setCallback((a, type, c, d) -> {
                     this.playClickSound();
                     this.be.allowHoppers = !this.be.allowHoppers;
@@ -79,7 +79,7 @@ public class ShopSettingsGui extends BaseShopGui {
                         .append(Text.literal("   ").formatted(Formatting.DARK_GRAY))
                         .append(TextUtil.gui("setup.click_to_change_mode.2")).formatted(Formatting.GRAY)
                 )
-                .hideFlags()
+                .hideDefaultTooltip()
                 .setCallback((a, type, c, d) -> {
                     int dir = type.shift ? -1 : 1;
                     this.playClickSound();
@@ -112,7 +112,7 @@ public class ShopSettingsGui extends BaseShopGui {
                         .append(Text.literal("   ").formatted(Formatting.DARK_GRAY))
                         .append(TextUtil.gui("setup.click_to_change_mode.2")).formatted(Formatting.GRAY)
                 )
-                .hideFlags()
+                .hideDefaultTooltip()
                 .setCallback((a, type, c, d) -> {
                     if (!handler.canSwitch()) {
                         this.playDismissSound();
@@ -161,7 +161,7 @@ public class ShopSettingsGui extends BaseShopGui {
                         .append(Text.literal("   ").formatted(Formatting.DARK_GRAY))
                         .append(TextUtil.gui("setup.click_to_change_mode.2")).formatted(Formatting.GRAY)
                 )
-                .hideFlags()
+                .hideDefaultTooltip()
                 .setCallback((a, type, c, d) -> {
                     if (!handler.canSwitch()) {
                         this.playDismissSound();

@@ -66,7 +66,7 @@ public class ItemModificatorGui extends SimpleGui implements ExtraGui {
     }
 
     private GuiElementInterface setStackSizeElement(Item item, int i) {
-        return new GuiElementBuilder(item).setName(TextUtil.gui("modifying_item.stack_size", i)).setCount(i).hideFlags().setCallback((a, b, c) -> {
+        return new GuiElementBuilder(item).setName(TextUtil.gui("modifying_item.stack_size", i)).setCount(i).hideDefaultTooltip().setCallback((a, b, c) -> {
             this.playClickSound();
             this.holder.getItemStack().setCount(i);
         }).build();
