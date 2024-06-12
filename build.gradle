@@ -1,3 +1,15 @@
+buildscript {
+	dependencies {
+		classpath "de.guntram.mcmod:crowdin-translate:1.4+1.19.3"
+	}
+	repositories {
+		maven {
+			name = 'CrowdinTranslate source'
+			url = "https://minecraft.guntram.de/maven/"
+		}
+	}
+}
+
 plugins {
 	id 'fabric-loom' version '1.6.+'
 	id 'maven-publish'
@@ -12,6 +24,12 @@ targetCompatibility = JavaVersion.VERSION_21
 archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
+
+apply plugin: 'de.guntram.mcmod.crowdin-translate'
+crowdintranslate.crowdinProjectName = 'patbox-mods'
+crowdintranslate.jsonSourceName = 'universal_shops'
+crowdintranslate.minecraftProjectName = '../data/universal_shops'
+crowdintranslate.verbose = false
 
 repositories {
 	// Add repositories to retrieve artifacts from in here.
