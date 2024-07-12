@@ -286,7 +286,7 @@ public abstract class PriceHandler extends GenericHandler {
         @Override
         protected NbtElement writeValueNbt(RegistryWrapper.WrapperLookup lookup) {
             var nbt = new NbtCompound();
-            nbt.put("Value", this.value.encode(lookup));
+            nbt.put("Value", this.value.encodeAllowEmpty(lookup));
             nbt.put("CurrencyContainer", this.currencyInventory.toNbtList(lookup));
             return nbt;
         }

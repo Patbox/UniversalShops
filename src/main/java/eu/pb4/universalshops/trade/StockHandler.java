@@ -181,7 +181,7 @@ public abstract class StockHandler extends GenericHandler {
 
         @Override
         protected NbtElement writeValueNbt(RegistryWrapper.WrapperLookup lookup) {
-            return this.value.encode(lookup);
+            return this.value.encodeAllowEmpty(lookup);
         }
 
         @Override
