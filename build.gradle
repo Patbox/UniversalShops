@@ -1,17 +1,5 @@
-buildscript {
-	dependencies {
-		classpath "de.guntram.mcmod:crowdin-translate:1.4+1.19.3"
-	}
-	repositories {
-		maven {
-			name = 'CrowdinTranslate source'
-			url = "https://minecraft.guntram.de/maven/"
-		}
-	}
-}
-
 plugins {
-	id 'fabric-loom' version '1.6.+'
+	id 'fabric-loom' version '1.7.+'
 	id 'maven-publish'
 	id "com.modrinth.minotaur" version "2.+"
 	id 'com.matthewprenger.cursegradle' version '1.4.0'
@@ -25,12 +13,6 @@ archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
-apply plugin: 'de.guntram.mcmod.crowdin-translate'
-crowdintranslate.crowdinProjectName = 'patbox-mods'
-crowdintranslate.jsonSourceName = 'universal_shops'
-crowdintranslate.minecraftProjectName = '../data/universal_shops'
-crowdintranslate.verbose = false
-
 repositories {
 	// Add repositories to retrieve artifacts from in here.
 	// You should only use this when depending on other mods because
@@ -39,6 +21,7 @@ repositories {
 	// for more information about repositories.
 	//maven { url 'https://maven.nucleoid.xyz' }
 	maven { url 'https://maven.nucleoid.xyz' }
+	maven { url 'https://jitpack.io' }
 	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 	mavenLocal()
 }
@@ -52,16 +35,17 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modImplementation include('xyz.nucleoid:server-translations-api:2.3.1+1.21-pre2')
-	modImplementation include('eu.pb4:polymer-core:0.9.4+1.21')
-	modImplementation include('eu.pb4:polymer-virtual-entity:0.9.4+1.21')
-	modImplementation include('eu.pb4:polymer-resource-pack:0.9.4+1.21')
-	modLocalRuntime 'eu.pb4:polymer-autohost:0.9.4+1.21'
-	modImplementation include("eu.pb4:sgui:1.6.0+1.21")
-	modImplementation include("eu.pb4:placeholder-api:2.4.0+1.21")
+	modImplementation include('xyz.nucleoid:server-translations-api:2.4.0+1.21.2-rc1')
+	modImplementation include('eu.pb4:polymer-core:0.10.0+1.21.2')
+	modImplementation include('eu.pb4:polymer-virtual-entity:0.10.0+1.21.2')
+	modImplementation include('eu.pb4:polymer-resource-pack:0.10.0+1.21.2')
+	modLocalRuntime 'eu.pb4:polymer-autohost:0.10.0+1.21.2'
+	modImplementation include("eu.pb4:sgui:1.7.1+1.21.2")
+	modImplementation include("eu.pb4:placeholder-api:2.5.0+1.21.2")
 	modImplementation include("eu.pb4:common-protection-api:1.0.0")
 	modImplementation include("eu.pb4:common-economy-api:1.1.1")
-	modImplementation include("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
+	//modImplementation include("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
+	modImplementation include("com.github.sakura-ryoko:fabric-permissions-api:dev~snapshot-jitpack-SNAPSHOT")
 
 	// Uncomment the following line to enable the deprecated Fabric API modules. 
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.

@@ -25,6 +25,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import xyz.nucleoid.packettweaker.PacketContext;
 
 public class TradeShopBlock extends BlockWithEntity implements PolymerHeadBlock, BlockAttackInteractionAware {
     public static Property<Direction> ATTACHED = EnumProperty.of("attachment", Direction.class, (x) -> x != Direction.UP);
@@ -72,14 +73,14 @@ public class TradeShopBlock extends BlockWithEntity implements PolymerHeadBlock,
     }
 
     @Override
-    public String getPolymerSkinValue(BlockState state, BlockPos pos, ServerPlayerEntity player) {
+    public String getPolymerSkinValue(BlockState state, BlockPos pos, PacketContext context) {
         return isAdmin
                 ? "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGY0ZmNkOTU5OGExZmQzOWMyOGY1MDgwOWU0Y2U4YTEzMjJhZDQ4YTlhYmQ4YzIzZjIxMTg4Y2UwYTgyODhlNCJ9fX0="
                 : "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2UzZGViNTdlYWEyZjRkNDAzYWQ1NzI4M2NlOGI0MTgwNWVlNWI2ZGU5MTJlZTJiNGVhNzM2YTlkMWY0NjVhNyJ9fX0=";
     }
 
     @Override
-    public BlockState getPolymerBlockState(BlockState state) {
+    public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
         var dir = state.get(ATTACHED);
 
         if (dir == Direction.DOWN) {
@@ -106,7 +107,7 @@ public class TradeShopBlock extends BlockWithEntity implements PolymerHeadBlock,
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (player instanceof ServerPlayerEntity serverPlayer && world.getBlockEntity(pos) instanceof TradeShopBlockEntity be) {
             be.openGui(serverPlayer);
-            return ActionResult.SUCCESS;
+            return ActionResult.SUCCESS_SERVER;
         }
 
         return super.onUse(state, world, pos, player, hit);

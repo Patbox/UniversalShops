@@ -10,22 +10,27 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+
+import java.util.function.Function;
 
 public class USRegistry {
 
-    public static final TradeShopBlock BLOCK = register("trade_block", new TradeShopBlock(false, AbstractBlock.Settings.create().nonOpaque().strength(2.8F, 3600000.0F)), Registries.BLOCK);
-    public static final TradeShopBlock BLOCK_ADMIN = register("admin_trade_block", new TradeShopBlock(true, AbstractBlock.Settings.create().nonOpaque().strength(-1.0F, 3600000.0F).dropsNothing()), Registries.BLOCK);
-    public static final BlockEntityType<TradeShopBlockEntity> BLOCK_ENTITY_TYPE = register("trade_block", FabricBlockEntityTypeBuilder.create(TradeShopBlockEntity::new, BLOCK, BLOCK_ADMIN).build(), Registries.BLOCK_ENTITY_TYPE);
-    public static final TradeShopBlockItem ITEM = register("trade_block",
-            new TradeShopBlockItem(BLOCK, new Item.Settings()), Registries.ITEM);
-    public static final TradeShopBlockItem ITEM_ADMIN = register("admin_trade_block",
-            new TradeShopBlockItem(BLOCK_ADMIN, new Item.Settings()), Registries.ITEM);
+    public static final TradeShopBlock BLOCK = register("trade_block", (k) -> new TradeShopBlock(false, AbstractBlock.Settings.create().registryKey(k).nonOpaque().strength(2.8F, 3600000.0F)), Registries.BLOCK);
+    public static final TradeShopBlock BLOCK_ADMIN = register("admin_trade_block", (k) -> new TradeShopBlock(true, AbstractBlock.Settings.create().registryKey(k).nonOpaque().strength(-1.0F, 3600000.0F).dropsNothing()), Registries.BLOCK);
+    public static final BlockEntityType<TradeShopBlockEntity> BLOCK_ENTITY_TYPE = register("trade_block", (k) -> FabricBlockEntityTypeBuilder.create(TradeShopBlockEntity::new, BLOCK, BLOCK_ADMIN).build(), Registries.BLOCK_ENTITY_TYPE);
+    public static final TradeShopBlockItem ITEM = register("trade_block", (k) ->
+            new TradeShopBlockItem(BLOCK, new Item.Settings().registryKey(k).useBlockPrefixedTranslationKey()), Registries.ITEM);
+    public static final TradeShopBlockItem ITEM_ADMIN = register("admin_trade_block", (k) ->
+            new TradeShopBlockItem(BLOCK_ADMIN, new Item.Settings().registryKey(k).useBlockPrefixedTranslationKey()), Registries.ITEM);
 
-    public static <A extends T, T> A register(String key, A value, Registry<T> registry) {
-        if (value instanceof BlockEntityType<?> blockEntityType) {
+    public static <A extends T, T> A register(String key, Function<RegistryKey<T>, A> value, Registry<T> registry) {
+        var id = UniversalShopsMod.id(key);
+        var v = value.apply(RegistryKey.of(registry.getKey(), id));
+        if (v instanceof BlockEntityType<?> blockEntityType) {
             PolymerBlockUtils.registerBlockEntity(blockEntityType);
         }
-        return Registry.register(registry, UniversalShopsMod.id(key), value);
+        return Registry.register(registry, id, v);
     }
 
     public static void register() {

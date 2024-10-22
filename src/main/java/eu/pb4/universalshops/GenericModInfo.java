@@ -60,8 +60,7 @@ public class GenericModInfo {
 
             try {
                 about.add(Text.literal(container.getMetadata().getName()).setStyle(Style.EMPTY.withColor(0xffcc00).withBold(true).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL,container.getMetadata().getContact().get("github").orElse("")))));
-                about.add(TextUtil.text("about.version").setStyle(Style.EMPTY.withColor(0x59b8f7))
-                        .append(Text.literal(container.getMetadata().getVersion().getFriendlyString()).setStyle(Style.EMPTY.withColor(Formatting.WHITE))));
+                about.add(TextUtil.text("about.version", Text.literal(container.getMetadata().getVersion().getFriendlyString()).setStyle(Style.EMPTY.withColor(Formatting.WHITE))).setStyle(Style.EMPTY.withColor(0x59b8f7)));
 
                 aboutBasic.addAll(about);
                 aboutBasic.add(Text.empty());
