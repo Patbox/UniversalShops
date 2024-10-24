@@ -44,8 +44,8 @@ dependencies {
 	modImplementation include("eu.pb4:placeholder-api:2.5.0+1.21.2")
 	modImplementation include("eu.pb4:common-protection-api:1.0.0")
 	modImplementation include("eu.pb4:common-economy-api:1.1.1")
-	//modImplementation include("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
-	modImplementation include("com.github.sakura-ryoko:fabric-permissions-api:dev~snapshot-jitpack-SNAPSHOT")
+	modImplementation include("me.lucko:fabric-permissions-api:0.3.2")
+	//modImplementation include("com.github.sakura-ryoko:fabric-permissions-api:dev~snapshot-jitpack-SNAPSHOT")
 
 	// Uncomment the following line to enable the deprecated Fabric API modules. 
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.

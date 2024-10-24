@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "util",
   "key": {
-    "P": {
-      "tag": "minecraft:planks"
-    },
-    "W": {
-      "tag": "minecraft:wool"
-    },
-    "I": {
-      "item": "minecraft:iron_ingot"
-    }
+    "P": "#minecraft:planks",
+    "W": "#minecraft:wool",
+    "I": "minecraft:iron_ingot"
   },
   "pattern": [
     "PWP",
