@@ -1,17 +1,13 @@
 {
   "text.universal_shops.about.version": "Versión: %s",
   "text.universal_shops.about.contributors": "Colaboradores",
-
   "gui.universal_shops.stock_left": "Stock restante: %s",
   "gui.universal_shops.max_stock_left": "Puedes comprar: %s",
-
   "gui.universal_shops.shop.price_info": "Precio: %s",
-  "gui.universal_shops.shop.stock_info": "Stock: %s",
   "gui.universal_shops.shop.currency_storage": "Almacenamiento de Moneda",
   "gui.universal_shops.shop.settings": "Configuración de Tienda",
   "gui.universal_shops.shop.title": "Tienda de %s",
   "gui.universal_shops.shop.title.admin": "Tienda de Admin",
-
   "gui.universal_shops.click_to_buy": "Clic para comprar",
   "gui.universal_shops.out_of_stock": "Fuera de stock!",
   "gui.universal_shops.setup.cant_change_pricehandler.1": "No se puede modificar esta opción!",
@@ -37,7 +33,6 @@
   "gui.universal_shops.virtual_balance.settings.title": "Configuración de Dinero",
   "gui.universal_shops.virtual_balance.selected_account": "Cantidad Seleccionada: %s",
   "gui.universal_shops.virtual_balance.balance": "Cantidad de Dinero Total: %s",
-
   "text.universal_shops.prefix": "Tienda",
   "text.universal_shops.not_enough_shop_storage_space": "No hay suficiente espacio en la tienda!",
   "text.universal_shops.not_enough_currency": "No tienes suficiente moneda!",
@@ -54,18 +49,14 @@
   "text.universal_shops.virtual_money.cant_store": "No se puede almacenar el dinero!",
   "text.universal_shops.virtual_money.not_enough_money": "Falló la transacción! %s",
   "text.universal_shops.virtual_money.no_account": "No tienes la cuenta requerida!",
-
   "pricehandler.universal_shops.free": "Gratis",
   "pricehandler.universal_shops.items": "Ítem",
   "pricehandler.universal_shops.virtual_balance": "Dinero",
-
   "stockhandler.universal_shops.single_item": "Ítems Iguales",
   "stockhandler.universal_shops.selected_item": "Cualquier Ítem",
-
   "hologram_type.universal_shops.full": "Completo",
   "hologram_type.universal_shops.icon": "Sólo ícono",
   "hologram_type.universal_shops.disabled": "Desactivado",
-
   "block.universal_shops.trade_block": "Tienda",
   "block.universal_shops.admin_trade_block": "Tienda de Admin"
 }

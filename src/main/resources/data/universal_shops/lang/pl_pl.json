@@ -1,17 +1,14 @@
 {
   "text.universal_shops.about.version": "Wersja: %s",
   "text.universal_shops.about.contributors": "Kontrybutorzy",
-
   "gui.universal_shops.stock_left": "Ilość do kupna: %s",
   "gui.universal_shops.max_stock_left": "Możesz kupić: %s",
-
   "gui.universal_shops.shop.price_info": "Cena: %s",
   "gui.universal_shops.shop.stock_info": "Ilość: %s",
   "gui.universal_shops.shop.currency_storage": "Dochód",
   "gui.universal_shops.shop.settings": "Ustawienia sklepu",
   "gui.universal_shops.shop.title": "Sklep %s",
   "gui.universal_shops.shop.title.admin": "Sklep administratora",
-
   "gui.universal_shops.click_to_buy": "Kliknij przedmiot aby go kupić",
   "gui.universal_shops.out_of_stock": "Brak zasobów!",
   "gui.universal_shops.setup.cant_change_pricehandler.1": "Nie możesz zmienić tego ustawienia!",
@@ -37,7 +34,6 @@
   "gui.universal_shops.virtual_balance.settings.title": "Ustawienia waluty",
   "gui.universal_shops.virtual_balance.selected_account": "Wybierz konto: %s",
   "gui.universal_shops.virtual_balance.balance": "Całkowity balans: %s",
-
   "text.universal_shops.prefix": "Skple",
   "text.universal_shops.not_enough_shop_storage_space": "Brak wystarczającego miejsca w sklepie!",
   "text.universal_shops.not_enough_currency": "Brak środków!",
@@ -54,20 +50,15 @@
   "text.universal_shops.virtual_money.cant_store": "Nie można przelać środków!",
   "text.universal_shops.virtual_money.not_enough_money": "Tranzakcja nieudana! %s",
   "text.universal_shops.virtual_money.no_account": "Nie posiadasz wymaganego konta!",
-
   "pricehandler.universal_shops.free": "Darmowy",
   "pricehandler.universal_shops.items": "Przedmiot",
   "pricehandler.universal_shops.virtual_balance": "Pieniądze",
-
   "stockhandler.universal_shops.single_item": "Pojedyńczy przedmiot",
   "stockhandler.universal_shops.selected_item": "Wybieralny przedmiot",
-
   "hologram_type.universal_shops.full": "Całkowity",
   "hologram_type.universal_shops.icon": "Tylko ikona",
   "hologram_type.universal_shops.disabled": "Wyłączony",
-
   "block.universal_shops.trade_block": "Sklep",
   "block.universal_shops.admin_trade_block": "Sklep administratorski",
-
   "gui.universal_shops.modifying_item.change_item.select_item_group.title": "Wybierz grupę przedmiotów"
 }

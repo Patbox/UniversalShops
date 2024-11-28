@@ -1,17 +1,13 @@
 {
-  "text.universal_shops.about.version": "Version: %s",
   "text.universal_shops.about.contributors": "Helfer",
-
   "gui.universal_shops.stock_left": "Übriger Vorrat: %s",
   "gui.universal_shops.max_stock_left": "Du kannst erwerben: %s",
-
   "gui.universal_shops.shop.price_info": "Preis: %s",
   "gui.universal_shops.shop.stock_info": "Vorrat: %s",
   "gui.universal_shops.shop.currency_storage": "Währungslager",
   "gui.universal_shops.shop.settings": "Shop-Einstellungen",
   "gui.universal_shops.shop.title": "%ss Shop",
   "gui.universal_shops.shop.title.admin": "Admin-Shop",
-
   "gui.universal_shops.click_to_buy": "Klicke auf den Gegenstand um ihn zu kaufen.",
   "gui.universal_shops.out_of_stock": "Ausverkauft!",
   "gui.universal_shops.setup.cant_change_pricehandler.1": "Einstellung kann nicht geändert werden!",
@@ -37,8 +33,6 @@
   "gui.universal_shops.virtual_balance.settings.title": "Währungseinstellungen",
   "gui.universal_shops.virtual_balance.selected_account": "Aktiver Account: %s",
   "gui.universal_shops.virtual_balance.balance": "Kontostand: %s",
-
-  "text.universal_shops.prefix": "Shop",
   "text.universal_shops.not_enough_shop_storage_space": "Kein Platz im Shop!",
   "text.universal_shops.not_enough_currency": "Das kannst du dir nicht leisten!",
   "text.universal_shops.not_enough_inventory_space": "Dafür hast du keinen Platz!",
@@ -54,20 +48,15 @@
   "text.universal_shops.virtual_money.cant_store": "Kontostand kann nicht gespeichert werden!",
   "text.universal_shops.virtual_money.not_enough_money": "Transaktion fehlgeschlagen! %s",
   "text.universal_shops.virtual_money.no_account": "Du hast keinen erforderlichen Account!",
-
   "pricehandler.universal_shops.free": "Kostenlos",
   "pricehandler.universal_shops.items": "Gegenstand",
   "pricehandler.universal_shops.virtual_balance": "Kontostand",
-
   "stockhandler.universal_shops.single_item": "Spezifischer Gegenstand",
   "stockhandler.universal_shops.selected_item": "Jeder Inventar Slot",
-
   "hologram_type.universal_shops.full": "Komplett",
   "hologram_type.universal_shops.icon": "Nur Icon",
   "hologram_type.universal_shops.disabled": "Deaktiviert",
-
   "block.universal_shops.trade_block": "Handels-Shop",
   "block.universal_shops.admin_trade_block": "Admin-Handels-Shop",
-
   "gui.universal_shops.modifying_item.change_item.select_item_group.title": "Wähle Item-Gruppe"
 }
