@@ -30,14 +30,14 @@ public class SingleItemShopGui extends SingleGenericShopGui {
         if (stockCount != 0) {
             var count = stockHandler.transfer(true,
                     clickType.shift
-                            ? USUtil.addToInventory(USUtil.copyInventory(this.player.getInventory().main))
+                            ? USUtil.addToInventory(USUtil.copyInventory(this.player.getInventory().getMainStacks()))
                             : USUtil.addToInventory(DefaultedList.copyOf(ItemStack.EMPTY, this.player.currentScreenHandler.getCursorStack().copy()))
             );
 
             if (count >= stockHandler.value.getCount()) {
                 var paymentCheck = this.be.priceHandler.payFor(player, true);
                 if (paymentCheck.success()) {
-                    stockHandler.transfer(false, clickType.shift ? USUtil.addToInventory(this.player.getInventory().main) : USUtil.mergeIntoCursor(this.player.currentScreenHandler));
+                    stockHandler.transfer(false, clickType.shift ? USUtil.addToInventory(this.player.getInventory().getMainStacks()) : USUtil.mergeIntoCursor(this.player.currentScreenHandler));
                     this.playClickSound();
                     this.updateValueDisplays();
                     this.markDirty();

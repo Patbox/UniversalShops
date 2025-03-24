@@ -55,7 +55,7 @@ public abstract class PriceHandler extends GenericHandler {
     }
 
     public static PriceHandler readNbt(NbtCompound nbt, TradeShopBlockEntity blockEntity, RegistryWrapper.WrapperLookup lookup) {
-        var type = nbt.getString("PriceType");
+        var type = nbt.getString("PriceType", "");
 
         var definition = TYPES_MAP.get(type);
 
@@ -160,9 +160,10 @@ public abstract class PriceHandler extends GenericHandler {
             @Override
             public PriceHandler createFromNbt(NbtElement element, TradeShopBlockEntity blockEntity, RegistryWrapper.WrapperLookup lookup) {
                 var nbt = (NbtCompound) element;
-                var x = new SingleItem(this, ItemStack.fromNbtOrEmpty(lookup, nbt.getCompound("Value")), blockEntity);
+                var stack = nbt.getCompoundOrEmpty("Value");
+                var x = new SingleItem(this, stack.isEmpty() ? ItemStack.EMPTY : ItemStack.fromNbt(lookup, stack).orElse(ItemStack.EMPTY), blockEntity);
 
-                x.currencyInventory.readNbtList(nbt.getList("CurrencyContainer", NbtElement.COMPOUND_TYPE), lookup);
+                x.currencyInventory.readNbtList(nbt.getListOrEmpty("CurrencyContainer"), lookup);
                 return x;
             }
 
@@ -260,7 +261,7 @@ public abstract class PriceHandler extends GenericHandler {
             }
 
             return Result.failed(TextUtil.text(USUtil.canInsert(chest, this.value, this.value.getCount())  ? "not_enough_currency" : "not_enough_shop_storage_space",
-                    this.value.getName().copy().styled(x -> x.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackContent(this.value)))),
+                    this.value.getName().copy().styled(x -> x.withHoverEvent(new HoverEvent.ShowItem(this.value))),
                     this.value.getCount(), count));
         }
 
@@ -286,7 +287,9 @@ public abstract class PriceHandler extends GenericHandler {
         @Override
         protected NbtElement writeValueNbt(RegistryWrapper.WrapperLookup lookup) {
             var nbt = new NbtCompound();
-            nbt.put("Value", this.value.toNbtAllowEmpty(lookup));
+            if (!this.value.isEmpty()) {
+                nbt.put("Value", this.value.toNbt(lookup));
+            }
             nbt.put("CurrencyContainer", this.currencyInventory.toNbtList(lookup));
             return nbt;
         }
@@ -363,7 +366,7 @@ public abstract class PriceHandler extends GenericHandler {
             @Override
             public PriceHandler createFromNbt(NbtElement nbte, TradeShopBlockEntity blockEntity, RegistryWrapper.WrapperLookup lookup) {
                 var nbt = (NbtCompound) nbte;
-                return new VirtualBalance(this, Identifier.tryParse(nbt.getString("Currency")), nbt.getLong("Value"), nbt.getLong("Stored"), blockEntity);
+                return new VirtualBalance(this, Identifier.tryParse(nbt.getString("Currency", "")), nbt.getLong("Value", 0), nbt.getLong("Stored", 0), blockEntity);
 
             }
 

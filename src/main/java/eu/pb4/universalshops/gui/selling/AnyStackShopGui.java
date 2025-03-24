@@ -181,13 +181,13 @@ public class AnyStackShopGui extends BaseShopGui {
 
                 if (admin || gui.getBE().getContainer().getStack(this.slot) == this.itemStack) {
                     var count = USUtil.canInsert(clickType.shift
-                            ? USUtil.copyInventory(gui.getPlayer().getInventory().main)
+                            ? USUtil.copyInventory(gui.getPlayer().getInventory().getMainStacks())
                             : new SimpleInventory(gui.getPlayer().currentScreenHandler.getCursorStack().copy()), this.itemStack, this.itemStack.getCount());
 
                     if (count) {
                         var paymentCheck = gui.be.priceHandler.payFor(gui.player, true);
                         if (paymentCheck.success()) {
-                            (clickType.shift ? USUtil.addToInventory(gui.player.getInventory().main) : USUtil.mergeIntoCursor(gui.player.currentScreenHandler)).test(this.itemStack.copy());
+                            (clickType.shift ? USUtil.addToInventory(gui.player.getInventory().getMainStacks()) : USUtil.mergeIntoCursor(gui.player.currentScreenHandler)).test(this.itemStack.copy());
                             if (!admin) {
                                 this.itemStack.setCount(0);
                                 gui.be.getContainer().setStack(this.slot, ItemStack.EMPTY);

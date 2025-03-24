@@ -42,7 +42,7 @@ public abstract class StockHandler extends GenericHandler {
     }
     
     public static StockHandler readNbt(NbtCompound nbt, TradeShopBlockEntity blockEntity, RegistryWrapper.WrapperLookup lookup) {
-        var type = nbt.getString("StockType");
+        var type = nbt.getString("StockType", "");
 
         var definition = TYPES_MAP.get(type);
 
@@ -143,7 +143,8 @@ public abstract class StockHandler extends GenericHandler {
         public static final StockHandler.Definition   DEFINITION = new StockHandler.Definition  ("single_item", Items.NETHERITE_PICKAXE) {
             @Override
             public StockHandler createFromNbt(NbtElement compound, TradeShopBlockEntity blockEntity, RegistryWrapper.WrapperLookup lookup) {
-                return new SingleItem(this, ItemStack.fromNbtOrEmpty(lookup, (NbtCompound) compound), blockEntity);
+                return new SingleItem(this, compound.asCompound().map(NbtCompound::isEmpty).orElse(true) ? ItemStack.EMPTY
+                        : ItemStack.fromNbt(lookup, compound).orElse(ItemStack.EMPTY), blockEntity);
             }
 
             @Override
@@ -181,7 +182,7 @@ public abstract class StockHandler extends GenericHandler {
 
         @Override
         protected NbtElement writeValueNbt(RegistryWrapper.WrapperLookup lookup) {
-            return this.value.toNbtAllowEmpty(lookup);
+            return this.value.isEmpty() ? new NbtCompound() : this.value.toNbt(lookup);
         }
 
         @Override

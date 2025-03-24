@@ -17,9 +17,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.InventoryChangedListener;
 import net.minecraft.inventory.SidedInventory;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -56,7 +56,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
         this.textDisplay.setBillboardMode(DisplayEntity.BillboardMode.CENTER);
         this.textDisplay.setViewRange(0.5f);
         this.itemDisplay.setBillboardMode(DisplayEntity.BillboardMode.CENTER);
-        this.itemDisplay.setModelTransformation(ModelTransformationMode.GUI);
+        this.itemDisplay.setItemDisplayContext(ItemDisplayContext.GUI);
         this.itemDisplay.setLeftRotation(new Quaternionf().rotateY(MathHelper.PI));
         this.itemDisplay.setViewRange(0.5f);
         this.itemDisplay.setScale(new Vector3f(0.6f, 0.6f, 0.01f));
@@ -80,14 +80,14 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     @Override
     public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
         if (nbt.contains("ItemContainerPos")) {
-            this.containerPos = LegacyNbtHelper.toBlockPos(nbt.getCompound("ItemContainerPos"));
+            this.containerPos = LegacyNbtHelper.toBlockPos(nbt.getCompoundOrEmpty("ItemContainerPos"));
         }
 
         if (nbt.contains("Owner")) {
-            this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompound("Owner"));
+            this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompoundOrEmpty("Owner"));
         }
         try {
-            this.hologramMode = HologramMode.valueOf(nbt.getString("HologramMode"));
+            this.hologramMode = HologramMode.valueOf(nbt.getString("HologramMode", ""));
         } catch (Throwable e) {
 
         }
@@ -103,7 +103,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
             e.printStackTrace();
 
         }
-        this.allowHoppers = nbt.getBoolean("AllowHoppers");
+        this.allowHoppers = nbt.getBoolean("AllowHoppers", false);
     }
 
     public void tick() {
