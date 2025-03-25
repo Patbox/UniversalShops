@@ -92,12 +92,7 @@ public class TradeShopBlock extends BlockWithEntity implements PolymerHeadBlock,
 
     @Override
     public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
-        BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity instanceof TradeShopBlockEntity shop && shop.priceHandler.usesInventory()) {
-            ItemScatterer.spawn(world, pos, shop.priceHandler.getInventory());
-            world.updateComparators(pos, this);
-        }
-
+        world.updateComparators(pos, this);
         super.onStateReplaced(state, world, pos,  moved);
     }
 

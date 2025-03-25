@@ -27,6 +27,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -107,8 +108,15 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     }
 
     public void tick() {
-
         this.tickHolo();
+    }
+
+    @Override
+    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
+        super.onBlockReplaced(pos, oldState);
+        if (this.priceHandler.usesInventory() && this.world != null) {
+            ItemScatterer.spawn(world, pos, this.priceHandler.getInventory());
+        }
     }
 
     private void tickHolo() {
