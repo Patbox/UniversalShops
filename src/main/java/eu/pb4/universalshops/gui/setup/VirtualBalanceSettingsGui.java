@@ -29,7 +29,7 @@ public class VirtualBalanceSettingsGui extends BaseShopGui {
         super(ScreenHandlerType.HOPPER, player, blockEntity, Text.empty());
         this.controller = controller;
         var id = this.controller.getCurrencyId();
-        this.current = id != null ? CommonEconomy.getCurrency(player.server, id) : null;
+        this.current = id != null ? CommonEconomy.getCurrency(player.getServer(), id) : null;
         this.setSlot(1, GuiElements.FILLER);
         this.setSlot(3, GuiElements.FILLER);
         this.setSlot(4, GuiElements.BACK);
@@ -45,7 +45,7 @@ public class VirtualBalanceSettingsGui extends BaseShopGui {
     private void updateDynamic() {
         this.currencies.clear();
 
-        this.currencies.addAll(CommonEconomy.getCurrencies(this.player.server));
+        this.currencies.addAll(CommonEconomy.getCurrencies(this.player.getServer()));
 
         var b = GuiElementBuilder.from((this.current == null ? GuiElements.HEAD_QUESTION_MARK : this.current.icon()).copy())
                 .setName(TextUtil.gui("setup.virtual_balance.currency", (this.current == null ? TextUtil.text("not_set") : this.current.name().copy()).formatted(Formatting.YELLOW)).formatted(Formatting.WHITE));

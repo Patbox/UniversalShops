@@ -21,9 +21,10 @@ import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -46,6 +47,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     public boolean allowHoppers = false;
     public PriceHandler priceHandler = PriceHandler.Invalid.DEFINITION.createInitial(this);
     public StockHandler stockHandler = StockHandler.Invalid.DEFINITION.createInitial(this);
+    @Nullable
     public GameProfile owner;
     public HologramMode hologramMode = HologramMode.FULL;
     private int[] cachedSlots = new int[0];
@@ -64,47 +66,44 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
+    protected void writeData(WriteView view) {
         if (this.containerPos != null) {
-            nbt.put("ItemContainerPos", LegacyNbtHelper.fromBlockPos(this.containerPos));
+            view.put("ItemContainerPos", NbtCompound.CODEC, LegacyNbtHelper.fromBlockPos(this.containerPos));
         }
         if (this.owner != null) {
-            nbt.put("Owner", LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
+            view.put("Owner", NbtCompound.CODEC, LegacyNbtHelper.writeGameProfile(new NbtCompound(), this.owner));
         }
 
-        this.priceHandler.writeNbt(nbt, lookup);
-        this.stockHandler.writeNbt(nbt, lookup);
-        nbt.putBoolean("AllowHoppers", this.allowHoppers);
-        nbt.putString("HologramMode", this.hologramMode.name());
+        this.priceHandler.writeData(view);
+        this.stockHandler.writeData(view);
+        view.putBoolean("AllowHoppers", this.allowHoppers);
+        view.putString("HologramMode", this.hologramMode.name());
     }
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        if (nbt.contains("ItemContainerPos")) {
-            this.containerPos = LegacyNbtHelper.toBlockPos(nbt.getCompoundOrEmpty("ItemContainerPos"));
-        }
+    public void readData(ReadView view) {
+        this.containerPos = view.read("ItemContainerPos", NbtCompound.CODEC).map(LegacyNbtHelper::toBlockPos).orElse(null);
 
-        if (nbt.contains("Owner")) {
-            this.owner = LegacyNbtHelper.toGameProfile(nbt.getCompoundOrEmpty("Owner"));
-        }
+
+            this.owner = view.read("Owner", NbtCompound.CODEC).map(LegacyNbtHelper::toGameProfile).orElse(null);
         try {
-            this.hologramMode = HologramMode.valueOf(nbt.getString("HologramMode", ""));
+            this.hologramMode = HologramMode.valueOf(view.getString("HologramMode", ""));
         } catch (Throwable e) {
 
         }
 
         try {
-            this.priceHandler = PriceHandler.readNbt(nbt, this, lookup);
+            this.priceHandler = PriceHandler.readView(view, this);
         } catch (Throwable e) {
             e.printStackTrace();
         }
         try {
-            this.stockHandler = StockHandler.readNbt(nbt, this, lookup);
+            this.stockHandler = StockHandler.readData(view, this);
         } catch (Throwable e) {
             e.printStackTrace();
 
         }
-        this.allowHoppers = nbt.getBoolean("AllowHoppers", false);
+        this.allowHoppers = view.getBoolean("AllowHoppers", false);
     }
 
     public void tick() {

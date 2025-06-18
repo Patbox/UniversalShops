@@ -6,10 +6,11 @@ import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 
 public abstract class GenericHandler {
@@ -41,9 +42,9 @@ public abstract class GenericHandler {
 
     public abstract boolean isSetup();
 
-    public abstract NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup);
+    public abstract void writeData(WriteView view);
 
-    protected abstract NbtElement writeValueNbt(RegistryWrapper.WrapperLookup lookup);
+    protected abstract void writeValueData(WriteView view);
 
     public abstract boolean canSwitch();
 
@@ -66,7 +67,7 @@ public abstract class GenericHandler {
             this.icon = icon;
         }
 
-        public abstract T createFromNbt(NbtElement compound, TradeShopBlockEntity blockEntity, RegistryWrapper.WrapperLookup lookup);
+        public abstract T createFromData(ReadView view, TradeShopBlockEntity blockEntity);
         public abstract T createInitial(TradeShopBlockEntity blockEntity);
 
         public boolean canUse(ServerPlayerEntity player) {

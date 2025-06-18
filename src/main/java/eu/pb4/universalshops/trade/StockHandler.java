@@ -15,6 +15,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
@@ -35,18 +37,17 @@ public abstract class StockHandler extends GenericHandler {
 
     public abstract void openTradeGui(ServerPlayerEntity player);
     
-    public final NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookup) {
-        nbt.putString("StockType", this.definition.type);
-        nbt.put("StockValue", this.writeValueNbt(lookup));
-        return nbt;
+    public final void writeData(WriteView view) {
+        view.putString("StockType", this.definition.type);
+        this.writeValueData(view.get("StockValue"));
     }
     
-    public static StockHandler readNbt(NbtCompound nbt, TradeShopBlockEntity blockEntity, RegistryWrapper.WrapperLookup lookup) {
-        var type = nbt.getString("StockType", "");
+    public static StockHandler readData(ReadView view, TradeShopBlockEntity blockEntity) {
+        var type = view.getString("StockType", "");
 
         var definition = TYPES_MAP.get(type);
 
-        return definition != null ? definition.createFromNbt(nbt.get("StockValue"), blockEntity, lookup) : Invalid.DEFINITION.createInitial(blockEntity);
+        return definition != null ? definition.createFromData(view.getReadView("StockValue"), blockEntity) : Invalid.DEFINITION.createInitial(blockEntity);
     }
 
     public static void register(StockHandler.Definition   definition) {
@@ -82,9 +83,9 @@ public abstract class StockHandler extends GenericHandler {
     }
 
     public static final class Invalid extends StockHandler {
-        public static final StockHandler.Definition   DEFINITION = new StockHandler.Definition("invalid", TextUtil.text("not_set"), GuiElements.HEAD_QUESTION_MARK) {
+        public static final StockHandler.Definition  DEFINITION = new StockHandler.Definition("invalid", TextUtil.text("not_set"), GuiElements.HEAD_QUESTION_MARK) {
             @Override
-            public StockHandler createFromNbt(NbtElement compound, TradeShopBlockEntity blockEntity, RegistryWrapper.WrapperLookup lookup) {
+            public StockHandler createFromData(ReadView view, TradeShopBlockEntity blockEntity) {
                 return new Invalid(this, blockEntity);
             }
 
@@ -124,8 +125,8 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
-        protected NbtElement writeValueNbt(RegistryWrapper.WrapperLookup lookup) {
-            return new NbtCompound();
+        protected void writeValueData(WriteView view) {
+
         }
 
         @Override
@@ -142,9 +143,8 @@ public abstract class StockHandler extends GenericHandler {
     public static final class SingleItem extends StockHandler implements ItemModificatorGui.ItemStackHolder {
         public static final StockHandler.Definition   DEFINITION = new StockHandler.Definition  ("single_item", Items.NETHERITE_PICKAXE) {
             @Override
-            public StockHandler createFromNbt(NbtElement compound, TradeShopBlockEntity blockEntity, RegistryWrapper.WrapperLookup lookup) {
-                return new SingleItem(this, compound.asCompound().map(NbtCompound::isEmpty).orElse(true) ? ItemStack.EMPTY
-                        : ItemStack.fromNbt(lookup, compound).orElse(ItemStack.EMPTY), blockEntity);
+            public StockHandler createFromData(ReadView view, TradeShopBlockEntity blockEntity) {
+                return new SingleItem(this, view.read(ItemStack.MAP_CODEC).orElse(ItemStack.EMPTY), blockEntity);
             }
 
             @Override
@@ -181,8 +181,10 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
-        protected NbtElement writeValueNbt(RegistryWrapper.WrapperLookup lookup) {
-            return this.value.isEmpty() ? new NbtCompound() : this.value.toNbt(lookup);
+        protected void writeValueData(WriteView view) {
+            if (!this.value.isEmpty()) {
+                view.put(ItemStack.MAP_CODEC, this.value);
+            }
         }
 
         @Override
@@ -222,7 +224,7 @@ public abstract class StockHandler extends GenericHandler {
     public static final class SelectedItem extends StockHandler {
         public static final StockHandler.Definition   DEFINITION = new StockHandler.Definition  ("selected_item", Items.POTION) {
             @Override
-            public StockHandler createFromNbt(NbtElement compound, TradeShopBlockEntity blockEntity, RegistryWrapper.WrapperLookup lookup) {
+            public StockHandler createFromData(ReadView view, TradeShopBlockEntity blockEntity) {
                 return new SelectedItem(this, blockEntity);
             }
 
@@ -282,8 +284,8 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
-        protected NbtElement writeValueNbt(RegistryWrapper.WrapperLookup lookup) {
-            return new NbtCompound();
+        protected void writeValueData(WriteView view) {
+
         }
 
         @Override
