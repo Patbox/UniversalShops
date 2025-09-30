@@ -54,11 +54,11 @@
   "pricehandler.universal_shops.items": "Item",
   "pricehandler.universal_shops.virtual_balance": "Saldo",
   "stockhandler.universal_shops.single_item": "Item igual",
-  "stockhandler.universal_shops.selected_item": "Qualquer pack",
+  "stockhandler.universal_shops.selected_item": "Qualquer pilha",
   "hologram_type.universal_shops.full": "Completo",
   "hologram_type.universal_shops.icon": "Apenas ícone",
   "hologram_type.universal_shops.disabled": "Desativado",
-  "block.universal_shops.trade_block": "Loja de trocas",
-  "block.universal_shops.admin_trade_block": "Loja de trocas de administradores",
+  "block.universal_shops.trade_block": "Loja de Trocas",
+  "block.universal_shops.admin_trade_block": "Loja de Trocas de Administradores",
   "gui.universal_shops.modifying_item.change_item.select_item_group.title": "Selecionar grupo de itens"
 }

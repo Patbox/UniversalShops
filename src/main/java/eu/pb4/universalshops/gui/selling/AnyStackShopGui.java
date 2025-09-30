@@ -97,7 +97,7 @@ public class AnyStackShopGui extends BaseShopGui {
                 List<Text> tooltip;
 
                 try {
-                    tooltip = item.getTooltip(Item.TooltipContext.create(this.player.getWorld()), this.player, TooltipType.Default.BASIC);
+                    tooltip = item.getTooltip(Item.TooltipContext.create(this.player.getEntityWorld()), this.player, TooltipType.Default.BASIC);
                 } catch (Throwable e) {
                     tooltip = List.of(item.getName());
                 }

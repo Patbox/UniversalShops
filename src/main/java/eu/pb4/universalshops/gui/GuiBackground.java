@@ -2,6 +2,7 @@ package eu.pb4.universalshops.gui;
 
 import eu.pb4.universalshops.UniversalShopsMod;
 import net.minecraft.text.Style;
+import net.minecraft.text.StyleSpriteSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -15,10 +16,10 @@ public class GuiBackground {
 
 
     private static Text of(char id) {
-        return Text.literal(new StringBuffer().append('-').append(id).append('.').toString()).setStyle(Style.EMPTY.withColor(0xFFFFFF).withFont(UniversalShopsMod.id("gui")));
+        return Text.literal(new StringBuffer().append('-').append(id).append('.').toString()).setStyle(Style.EMPTY.withColor(0xFFFFFF).withFont(new StyleSpriteSource.Font(UniversalShopsMod.id("gui"))));
     }
 
     private static Text ofCenter(char id) {
-        return Text.literal(new StringBuffer().append('_').append(id).append('.').toString()).setStyle(Style.EMPTY.withColor(0xFFFFFF).withFont(UniversalShopsMod.id("gui")));
+        return Text.literal(new StringBuffer().append('_').append(id).append('.').toString()).setStyle(Style.EMPTY.withColor(0xFFFFFF).withFont(new StyleSpriteSource.Font(UniversalShopsMod.id("gui"))));
     }
 }

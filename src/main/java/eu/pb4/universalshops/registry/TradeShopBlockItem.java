@@ -23,7 +23,7 @@ public class TradeShopBlockItem extends PolymerHeadBlockItem {
 
         if (world.getBlockEntity(pos) instanceof TradeShopBlockEntity shop) {
             if (!x && player instanceof ServerPlayerEntity serverPlayer) {
-                shop.owner = new GameProfile(player.getGameProfile().getId(), player.getGameProfile().getName());
+                shop.owner = new GameProfile(player.getGameProfile().id(), player.getGameProfile().name());
                 shop.openSettings(serverPlayer);
             }
         }

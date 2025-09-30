@@ -372,7 +372,7 @@ public abstract class PriceHandler extends GenericHandler {
 
             @Override
             public boolean canUse(ServerPlayerEntity player) {
-                return !CommonEconomy.getCurrencies(player.getServer()).isEmpty();
+                return !CommonEconomy.getCurrencies(player.getEntityWorld().getServer()).isEmpty();
             }
         };
         private static final GuiElementInterface SETTINGS = new GuiElementBuilder(Items.GREEN_STAINED_GLASS_PANE).setName(TextUtil.text("configure")).setCallback((a, b, c, g) -> {

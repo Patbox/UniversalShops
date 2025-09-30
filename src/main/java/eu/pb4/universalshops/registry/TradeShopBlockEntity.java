@@ -235,7 +235,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     }
 
     public boolean isOwner(GameProfile gameProfile) {
-        return !isAdmin() && this.owner != null && this.owner.getId().equals(gameProfile.getId());
+        return !isAdmin() && this.owner != null && this.owner.id().equals(gameProfile.id());
     }
 
     public boolean isFullySetup() {
@@ -258,7 +258,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     }
 
     public Text getTitle() {
-        return TextUtil.gui("shop.title" + (this.isAdmin() ? ".admin" : ""), this.owner != null ? this.owner.getName() : Text.literal("<???>"));
+        return TextUtil.gui("shop.title" + (this.isAdmin() ? ".admin" : ""), this.owner != null ? this.owner.name() : Text.literal("<???>"));
     }
 
     public boolean isAdmin() {

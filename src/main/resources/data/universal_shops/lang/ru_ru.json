@@ -8,7 +8,7 @@
   "gui.universal_shops.shop.currency_storage": "Хранилище валюты",
   "gui.universal_shops.shop.settings": "Настройки магазина",
   "gui.universal_shops.shop.title": "Магазин %s",
-  "gui.universal_shops.shop.title.admin": "Админ магазин",
+  "gui.universal_shops.shop.title.admin": "Магазин администратора",
   "gui.universal_shops.click_to_buy": "Нажмите на товар, чтобы купить",
   "gui.universal_shops.out_of_stock": "Нет в наличии!",
   "gui.universal_shops.setup.cant_change_pricehandler.1": "Нельзя изменить эту настройку!",
