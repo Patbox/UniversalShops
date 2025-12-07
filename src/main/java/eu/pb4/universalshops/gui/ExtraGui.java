@@ -5,13 +5,13 @@ import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.sgui.api.gui.SlotGuiInterface;
 import eu.pb4.universalshops.UniversalShopsMod;
 import eu.pb4.universalshops.other.USUtil;
-import net.minecraft.nbt.NbtInt;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.core.Holder;
+import net.minecraft.nbt.IntTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 
 public interface ExtraGui extends SlotGuiInterface {
     default void playClickSound() {
@@ -19,19 +19,19 @@ public interface ExtraGui extends SlotGuiInterface {
     }
 
     default void playDismissSound() {
-        playSound(SoundEvents.ITEM_SHIELD_BLOCK);
+        playSound(SoundEvents.SHIELD_BLOCK);
     }
 
     default void playSound(SoundEvent event) {
         USUtil.playUiSound(this.getPlayer(), event);
     }
 
-    default void playSound(RegistryEntry<SoundEvent> event) {
+    default void playSound(Holder<SoundEvent> event) {
         USUtil.playUiSound(this.getPlayer(), event.value());
     }
 
 
-    default MutableText texture(Text possibleTexture) {
+    default MutableComponent texture(Component possibleTexture) {
         return texture(this.getPlayer(), possibleTexture);
     }
 
@@ -39,15 +39,15 @@ public interface ExtraGui extends SlotGuiInterface {
         return hasTexture(this.getPlayer());
     }
 
-    static boolean hasTexture(ServerPlayerEntity player) {
-        return PolymerResourcePackUtils.hasMainPack(player) || PolymerServerNetworking.getMetadata(player.networkHandler, UniversalShopsMod.HELLO_PACKET, NbtInt.TYPE) != null;
+    static boolean hasTexture(ServerPlayer player) {
+        return PolymerResourcePackUtils.hasMainPack(player) || PolymerServerNetworking.getMetadata(player.connection, UniversalShopsMod.HELLO_PACKET, IntTag.TYPE) != null;
     }
 
-    static MutableText texture(ServerPlayerEntity player, Text possibleTexture) {
+    static MutableComponent texture(ServerPlayer player, Component possibleTexture) {
         if (hasTexture(player)) {
-            return Text.empty().append(possibleTexture);
+            return Component.empty().append(possibleTexture);
         } else {
-            return Text.empty();
+            return Component.empty();
         }
     }
 }

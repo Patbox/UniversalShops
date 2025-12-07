@@ -9,16 +9,18 @@ import eu.pb4.universalshops.gui.ExtraGui;
 import eu.pb4.universalshops.gui.GuiBackground;
 import eu.pb4.universalshops.gui.GuiElements;
 import eu.pb4.universalshops.other.TextUtil;
-import net.minecraft.item.*;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 public class ItemModificatorGui extends SimpleGui implements ExtraGui {
     private final ItemStackHolder holder;
     private final GuiInterface previousGui;
 
-    public ItemModificatorGui(ServerPlayerEntity player, ItemStackHolder holder) {
-        super(ScreenHandlerType.GENERIC_9X3, player, false);
+    public ItemModificatorGui(ServerPlayer player, ItemStackHolder holder) {
+        super(MenuType.GENERIC_9x3, player, false);
         this.previousGui = GuiHelpers.getCurrentGui(player);
         this.holder = holder;
 
@@ -38,7 +40,7 @@ public class ItemModificatorGui extends SimpleGui implements ExtraGui {
         this.setSlot(9 * 1 + 3, GuiElementBuilder.from(GuiElements.MINUS).setName(TextUtil.gui("modifying_item.stack_decrease")).setCallback((a, b, c) -> {
             if (this.holder.getItemStack().getCount() > 1) {
                 this.playClickSound();
-                this.holder.getItemStack().decrement(1);
+                this.holder.getItemStack().shrink(1);
             } else {
                 this.playDismissSound();
             }
@@ -47,7 +49,7 @@ public class ItemModificatorGui extends SimpleGui implements ExtraGui {
         this.setSlot(9 * 1 + 4, GuiElementBuilder.from(GuiElements.PLUS).setName(TextUtil.gui("modifying_item.stack_increase")).setCallback((a, b, c) -> {
             if (this.holder.getItemStack().getCount() < 64) {
                 this.playClickSound();
-                this.holder.getItemStack().increment(1);
+                this.holder.getItemStack().grow(1);
             } else {
                 this.playDismissSound();
             }
@@ -84,7 +86,7 @@ public class ItemModificatorGui extends SimpleGui implements ExtraGui {
                 return (a, b, c, g) -> {
                     if (g instanceof ExtraGui gui) {
                         gui.playClickSound();
-                        var stack = gui.getPlayer().currentScreenHandler.getCursorStack();
+                        var stack = gui.getPlayer().containerMenu.getCarried();
                         if (!stack.isEmpty()) {
                             holder.setItemStack(stack.copy());
                         } else {

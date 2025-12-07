@@ -4,14 +4,12 @@ import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.universalshops.gui.GuiElements;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public abstract class GenericHandler {
     public final TradeShopBlockEntity shop;
@@ -42,35 +40,35 @@ public abstract class GenericHandler {
 
     public abstract boolean isSetup();
 
-    public abstract void writeData(WriteView view);
+    public abstract void writeData(ValueOutput view);
 
-    protected abstract void writeValueData(WriteView view);
+    protected abstract void writeValueData(ValueOutput view);
 
     public abstract boolean canSwitch();
 
-    public abstract Text getText();
+    public abstract Component getText();
 
-    public abstract int getMaxAmount(ServerPlayerEntity player);
+    public abstract int getMaxAmount(ServerPlayer player);
 
     public static abstract class Definition<T extends GenericHandler> {
         public final String type;
-        public final Text displayName;
+        public final Component displayName;
         public final ItemStack icon;
 
         public Definition(String type, Item icon) {
-            this(type, TextUtil.of("pricehandler", type), icon.getDefaultStack());
+            this(type, TextUtil.of("pricehandler", type), icon.getDefaultInstance());
         }
 
-        public Definition(String type, Text displayName, ItemStack icon) {
+        public Definition(String type, Component displayName, ItemStack icon) {
             this.type = type;
             this.displayName = displayName;
             this.icon = icon;
         }
 
-        public abstract T createFromData(ReadView view, TradeShopBlockEntity blockEntity);
+        public abstract T createFromData(ValueInput view, TradeShopBlockEntity blockEntity);
         public abstract T createInitial(TradeShopBlockEntity blockEntity);
 
-        public boolean canUse(ServerPlayerEntity player) {
+        public boolean canUse(ServerPlayer player) {
             return true;
         }
     }

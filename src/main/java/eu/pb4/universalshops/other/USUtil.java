@@ -2,20 +2,22 @@ package eu.pb4.universalshops.other;
 
 import eu.pb4.universalshops.UniversalShopsMod;
 import me.lucko.fabric.api.permissions.v0.Permissions;
-import net.minecraft.block.entity.HopperBlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.text.Text;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSoundEntityPacket;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
@@ -27,27 +29,27 @@ public class USUtil {
     public static final Predicate<ItemStack> ALWAYS_ALLOW = (x) -> true;
 
     public static boolean areStacksMatching(ItemStack a, ItemStack b) {
-        return ItemStack.areItemsAndComponentsEqual(a, b);
+        return ItemStack.isSameItemSameComponents(a, b);
     }
 
-    public static int transfer(Inventory inventory, Predicate<ItemStack> shouldRemove, int maxCount, boolean dryRun, Predicate<ItemStack> consumer) {
+    public static int transfer(Container inventory, Predicate<ItemStack> shouldRemove, int maxCount, boolean dryRun, Predicate<ItemStack> consumer) {
         if (maxCount < 1) {
             return 0;
         }
 
         int i = 0;
 
-        for (int j = 0; j < inventory.size(); ++j) {
-            ItemStack itemStack = inventory.getStack(j);
+        for (int j = 0; j < inventory.getContainerSize(); ++j) {
+            ItemStack itemStack = inventory.getItem(j);
             int k = transfer(itemStack, shouldRemove, maxCount - i, dryRun, consumer);
             if (k > 0 && !dryRun && itemStack.isEmpty()) {
-                inventory.setStack(j, ItemStack.EMPTY);
+                inventory.setItem(j, ItemStack.EMPTY);
             }
 
             i += k;
         }
         if (i != 0) {
-            inventory.markDirty();
+            inventory.setChanged();
         }
 
         return i;
@@ -64,7 +66,7 @@ public class USUtil {
                 }
 
                 if (!dryRun) {
-                    stack.decrement(i);
+                    stack.shrink(i);
                 }
             }
             return i;
@@ -74,59 +76,59 @@ public class USUtil {
     }
 
     @Nullable
-    public static Inventory getInventoryAt(World world, BlockPos pos) {
-        return HopperBlockEntity.getInventoryAt(world, pos);
+    public static Container getInventoryAt(Level world, BlockPos pos) {
+        return HopperBlockEntity.getContainerAt(world, pos);
     }
 
-    public static Text asText(ItemStack value) {
-        return value.getCount() == 1 ? value.getName() : Text.empty().append(value.getName()).append(" × " + value.getCount());
+    public static Component asText(ItemStack value) {
+        return value.getCount() == 1 ? value.getHoverName() : Component.empty().append(value.getHoverName()).append(" × " + value.getCount());
     }
 
-    public static SimpleInventory copyInventory(Inventory input) {
-        var out = new SimpleInventory(input.size());
-        for (int i = 0; i < input.size(); i++) {
-            out.setStack(i, input.getStack(i).copy());
+    public static SimpleContainer copyInventory(Container input) {
+        var out = new SimpleContainer(input.getContainerSize());
+        for (int i = 0; i < input.getContainerSize(); i++) {
+            out.setItem(i, input.getItem(i).copy());
         }
         return out;
     }
 
-    public static boolean checkAdmin(PlayerEntity player, String permission) {
+    public static boolean checkAdmin(Player player, String permission) {
         return Permissions.check(player, UniversalShopsMod.MOD_ID + "." + permission, 3);
     }
 
-    public static Predicate<ServerCommandSource> requireAdmin(String permission) {
+    public static Predicate<CommandSourceStack> requireAdmin(String permission) {
         return Permissions.require(UniversalShopsMod.MOD_ID + "." + permission, 3);
     }
 
-    public static boolean checkDefault(PlayerEntity player, String permission) {
+    public static boolean checkDefault(Player player, String permission) {
         return Permissions.check(player, UniversalShopsMod.MOD_ID + "." + permission, true);
     }
 
-    public static Predicate<ServerCommandSource> requireDefault(String permission) {
+    public static Predicate<CommandSourceStack> requireDefault(String permission) {
         return Permissions.require(UniversalShopsMod.MOD_ID + "." + permission, true);
     }
 
-    public static SimpleInventory copyInventory(DefaultedList<ItemStack> input) {
-        var out = new SimpleInventory(input.size());
+    public static SimpleContainer copyInventory(NonNullList<ItemStack> input) {
+        var out = new SimpleContainer(input.size());
         for (int i = 0; i < input.size(); i++) {
-            out.setStack(i, input.get(i).copy());
+            out.setItem(i, input.get(i).copy());
         }
         return out;
     }
 
-    public static Predicate<ItemStack> addToInventory(Inventory inventory) {
+    public static Predicate<ItemStack> addToInventory(Container inventory) {
         return (i) -> addStack(inventory, i).isEmpty();
     }
 
-    public static Predicate<ItemStack> addToInventory(DefaultedList<ItemStack> inventory) {
+    public static Predicate<ItemStack> addToInventory(NonNullList<ItemStack> inventory) {
         return (i) -> addStack(inventory, i).isEmpty();
     }
 
-    public static ItemStack addStack(Inventory inv, ItemStack stack) {
-        return addStack(inv::getStack, inv::setStack, inv.size(), inv.getMaxCountPerStack(), stack);
+    public static ItemStack addStack(Container inv, ItemStack stack) {
+        return addStack(inv::getItem, inv::setItem, inv.getContainerSize(), inv.getMaxStackSize(), stack);
     }
 
-    public static ItemStack addStack(DefaultedList<ItemStack> inv, ItemStack stack) {
+    public static ItemStack addStack(NonNullList<ItemStack> inv, ItemStack stack) {
         return addStack(inv::get, inv::set, inv.size(), 64, stack);
     }
 
@@ -135,7 +137,7 @@ public class USUtil {
         // Insert to existing
         for(int i = 0; i < size; ++i) {
             var itemStack = getter.apply(i);
-            if (ItemStack.areItemsAndComponentsEqual(itemStack, stackCopy)) {
+            if (ItemStack.isSameItemSameComponents(itemStack, stackCopy)) {
                 transfer(maxStackSize, stackCopy, itemStack);
                 if (stackCopy.isEmpty()) {
                     break;
@@ -161,27 +163,27 @@ public class USUtil {
     }
 
     private static void transfer(int maxStackSize, ItemStack source, ItemStack target) {
-        int i = Math.min(maxStackSize, target.getMaxCount());
+        int i = Math.min(maxStackSize, target.getMaxStackSize());
         int j = Math.min(source.getCount(), i - target.getCount());
         if (j > 0) {
-            target.increment(j);
-            source.decrement(j);
+            target.grow(j);
+            source.shrink(j);
         }
     }
 
-    public static Predicate<ItemStack> mergeIntoCursor(ScreenHandler handler) {
+    public static Predicate<ItemStack> mergeIntoCursor(AbstractContainerMenu handler) {
         return (stack) -> {
-            if (handler.getCursorStack().isEmpty()) {
-                handler.setCursorStack(stack.copy());
+            if (handler.getCarried().isEmpty()) {
+                handler.setCarried(stack.copy());
                 stack.setCount(0);
                 return true;
-            } else if (ItemStack.areItemsAndComponentsEqual(stack, handler.getCursorStack())) {
-                var count = stack.getCount() + handler.getCursorStack().getCount();
+            } else if (ItemStack.isSameItemSameComponents(stack, handler.getCarried())) {
+                var count = stack.getCount() + handler.getCarried().getCount();
 
-                if (count > handler.getCursorStack().getMaxCount()) {
+                if (count > handler.getCarried().getMaxStackSize()) {
                     return false;
                 } else {
-                    handler.getCursorStack().setCount(count);
+                    handler.getCarried().setCount(count);
                     stack.setCount(0);
                     return true;
                 }
@@ -191,15 +193,15 @@ public class USUtil {
         };
     }
 
-    public static void playUiSound(ServerPlayerEntity player, SoundEvent event) {
-        player.playSoundToPlayer(event, SoundCategory.MASTER, 0.8f, 1);
+    public static void playUiSound(ServerPlayer player, SoundEvent event) {
+        player.connection.send (new ClientboundSoundEntityPacket(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(event), SoundSource.UI, player, 0.8f, 1, player.getRandom().nextLong()));
     }
 
-    public static boolean canInsert(Inventory chest, ItemStack value, int count) {
-        return canInsert(chest::getStack, chest.size(), value, count);
+    public static boolean canInsert(Container chest, ItemStack value, int count) {
+        return canInsert(chest::getItem, chest.getContainerSize(), value, count);
     }
 
-    public static boolean canInsert(DefaultedList<ItemStack> chest, ItemStack value, int count) {
+    public static boolean canInsert(NonNullList<ItemStack> chest, ItemStack value, int count) {
         return canInsert(chest::get, chest.size(), value, count);
     }
 
@@ -212,8 +214,8 @@ public class USUtil {
                 return true;
             }
 
-            if (ItemStack.areItemsAndComponentsEqual(stack, value)) {
-                count -= (stack.getMaxCount() - stack.getCount());
+            if (ItemStack.isSameItemSameComponents(stack, value)) {
+                count -= (stack.getMaxStackSize() - stack.getCount());
 
                 if (count <= 0) {
                     return true;
@@ -223,18 +225,18 @@ public class USUtil {
         return false;
     }
 
-    public static Iterable<ItemStack> iterable(Inventory container) {
+    public static Iterable<ItemStack> iterable(Container container) {
         return () -> new Iterator<>() {
             int i = 0;
 
             @Override
             public boolean hasNext() {
-                return i < container.size();
+                return i < container.getContainerSize();
             }
 
             @Override
             public ItemStack next() {
-                return container.getStack(i++);
+                return container.getItem(i++);
             }
         };
     }

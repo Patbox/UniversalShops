@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.11.+'
+	id 'fabric-loom' version '1.13.+'
 	id 'maven-publish'
 	id "com.modrinth.minotaur" version "2.+"
 	id 'com.matthewprenger.cursegradle' version '1.4.0'
@@ -29,22 +29,22 @@ repositories {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	mappings loom.officialMojangMappings()
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	modImplementation include('xyz.nucleoid:server-translations-api:2.5.2+1.21.9-pre3')
-	modImplementation include('eu.pb4:polymer-core:0.14.0-rc.2+1.21.9-rc1')
-	modImplementation include('eu.pb4:polymer-virtual-entity:0.14.0-rc.2+1.21.9-rc1')
-	modImplementation include('eu.pb4:polymer-resource-pack:0.14.0-rc.2+1.21.9-rc1')
+	modImplementation 'eu.pb4:polymer-core:0.15.0-beta.4+1.21.11-rc2'
+	modImplementation 'eu.pb4:polymer-virtual-entity:0.15.0-beta.4+1.21.11-rc2'
+	modImplementation 'eu.pb4:polymer-resource-pack:0.15.0-beta.4+1.21.11-rc2'
 	modLocalRuntime 'eu.pb4:polymer-autohost:0.14.0-rc.2+1.21.9-rc1'
 	modImplementation include("eu.pb4:sgui:1.11.0+1.21.9")
-	modImplementation include("eu.pb4:placeholder-api:2.8.0+1.21.9")
+	modImplementation include("eu.pb4:placeholder-api:2.8.1+1.21.10")
 	modImplementation include("eu.pb4:common-protection-api:1.0.0")
 	modImplementation include("eu.pb4:common-economy-api:1.1.1")
-	modImplementation include("me.lucko:fabric-permissions-api:0.4.2-patbox.1")
+	modImplementation include("me.lucko:fabric-permissions-api:0.6.0-patbox")
 	//modImplementation include("com.github.sakura-ryoko:fabric-permissions-api:dev~snapshot-jitpack-SNAPSHOT")
 
 	// Uncomment the following line to enable the deprecated Fabric API modules. 
@@ -113,6 +113,9 @@ curseforge {
 			addGameVersion((project.minecraft_version.contains("-") ? ((String) project.minecraft_version.split("-")[0] + "-snapshot") : project.minecraft_version))
 			addGameVersion "Fabric"
 			addGameVersion "Quilt"
+			relations {
+				requiredDependency "polymer"
+			}
 			mainArtifact(remapJar)
 
 			afterEvaluate {
@@ -139,6 +142,9 @@ if (System.getenv("MODRINTH")) {
 		gameVersions = [((String) project.minecraft_version)]
 		changelog = System.getenv("CHANGELOG")
 		loaders = ["fabric", "quilt"]
+		dependencies {
+			required.project "polymer"
+		}
 	}
 
 	remapJar {

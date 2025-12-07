@@ -4,7 +4,7 @@
   "package": "eu.pb4.universalshops.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "Schema1460Mixin"
+    "V1460Mixin"
   ],
   "client": [
   ],

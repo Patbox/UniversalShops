@@ -4,7 +4,6 @@ import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.gui.SlotGuiInterface;
 import eu.pb4.universalshops.gui.setup.ShopSettingsGui;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
-import net.minecraft.screen.slot.SlotActionType;
 
 public interface ShopGui extends ExtraGui {
     TradeShopBlockEntity getBE();
@@ -23,14 +22,14 @@ public interface ShopGui extends ExtraGui {
         return this.getBE().isAdmin();
     }
 
-    static void openSettingsCallback(int i, ClickType clickType, SlotActionType slotActionType, SlotGuiInterface guiInterface) {
+    static void openSettingsCallback(int i, ClickType clickType, net.minecraft.world.inventory.ClickType slotActionType, SlotGuiInterface guiInterface) {
         if (guiInterface instanceof ShopGui gui) {
             gui.playClickSound();
             gui.openSettings();
         }
     }
 
-    static void openCurrencyCallback(int i, ClickType clickType, SlotActionType slotActionType, SlotGuiInterface guiInterface) {
+    static void openCurrencyCallback(int i, ClickType clickType, net.minecraft.world.inventory.ClickType slotActionType, SlotGuiInterface guiInterface) {
         if (guiInterface instanceof ShopGui gui && gui.getBE().priceHandler.usesInventory()) {
             gui.playClickSound();
             gui.openCurrencyStorage();
@@ -38,6 +37,6 @@ public interface ShopGui extends ExtraGui {
     }
 
     default void markDirty() {
-        this.getBE().markDirty();
+        this.getBE().setChanged();
     };
 }

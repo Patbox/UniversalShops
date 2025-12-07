@@ -15,8 +15,8 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.nbt.NbtInt;
-import net.minecraft.util.Identifier;
+import net.minecraft.nbt.IntTag;
+import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 
 public class UniversalShopsMod implements ModInitializer, ClientModInitializer {
@@ -27,7 +27,7 @@ public class UniversalShopsMod implements ModInitializer, ClientModInitializer {
     public static final Identifier HELLO_PACKET = id("hello");
 
     public static Identifier id(String path) {
-        return Identifier.of(MOD_ID, path);
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 
     @Override
@@ -46,6 +46,6 @@ public class UniversalShopsMod implements ModInitializer, ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        PolymerClientNetworking.setClientMetadata(HELLO_PACKET, NbtInt.of(1));
+        PolymerClientNetworking.setClientMetadata(HELLO_PACKET, IntTag.valueOf(1));
     }
 }

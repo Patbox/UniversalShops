@@ -8,21 +8,18 @@ import eu.pb4.universalshops.gui.setup.ItemModificatorGui;
 import eu.pb4.universalshops.other.USUtil;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Predicate;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public abstract class StockHandler extends GenericHandler {
     public static final Map<String, StockHandler.Definition  > TYPES_MAP = new HashMap<>();
@@ -35,19 +32,19 @@ public abstract class StockHandler extends GenericHandler {
     public static void init() {
     }
 
-    public abstract void openTradeGui(ServerPlayerEntity player);
+    public abstract void openTradeGui(ServerPlayer player);
     
-    public final void writeData(WriteView view) {
+    public final void writeData(ValueOutput view) {
         view.putString("StockType", this.definition.type);
-        this.writeValueData(view.get("StockValue"));
+        this.writeValueData(view.child("StockValue"));
     }
     
-    public static StockHandler readData(ReadView view, TradeShopBlockEntity blockEntity) {
-        var type = view.getString("StockType", "");
+    public static StockHandler readData(ValueInput view, TradeShopBlockEntity blockEntity) {
+        var type = view.getStringOr("StockType", "");
 
         var definition = TYPES_MAP.get(type);
 
-        return definition != null ? definition.createFromData(view.getReadView("StockValue"), blockEntity) : Invalid.DEFINITION.createInitial(blockEntity);
+        return definition != null ? definition.createFromData(view.childOrEmpty("StockValue"), blockEntity) : Invalid.DEFINITION.createInitial(blockEntity);
     }
 
     public static void register(StockHandler.Definition   definition) {
@@ -55,25 +52,25 @@ public abstract class StockHandler extends GenericHandler {
         TYPES_MAP.put(definition.type, definition);
     }
     
-    public abstract Text getStockName();
+    public abstract Component getStockName();
 
     @Override
-    public Text getText() {
-        return Text.empty();
+    public Component getText() {
+        return Component.empty();
     }
 
     public static abstract class Definition extends GenericHandler.Definition<StockHandler>  {
         public Definition(String type, Item icon) {
-            this(type, TextUtil.of("stockhandler", type), icon.getDefaultStack());
+            this(type, TextUtil.of("stockhandler", type), icon.getDefaultInstance());
         }
 
-        public Definition(String type, Text displayName, ItemStack icon) {
+        public Definition(String type, Component displayName, ItemStack icon) {
             super(type, displayName, icon);
         }
     }
 
-    public record Result(boolean success, @Nullable Text failureMessage) {
-        public static Result failed(Text value) {
+    public record Result(boolean success, @Nullable Component failureMessage) {
+        public static Result failed(Component value) {
             return new Result(false, value);
         }
 
@@ -85,7 +82,7 @@ public abstract class StockHandler extends GenericHandler {
     public static final class Invalid extends StockHandler {
         public static final StockHandler.Definition  DEFINITION = new StockHandler.Definition("invalid", TextUtil.text("not_set"), GuiElements.HEAD_QUESTION_MARK) {
             @Override
-            public StockHandler createFromData(ReadView view, TradeShopBlockEntity blockEntity) {
+            public StockHandler createFromData(ValueInput view, TradeShopBlockEntity blockEntity) {
                 return new Invalid(this, blockEntity);
             }
 
@@ -95,7 +92,7 @@ public abstract class StockHandler extends GenericHandler {
             }
 
             @Override
-            public boolean canUse(ServerPlayerEntity player) {
+            public boolean canUse(ServerPlayer player) {
                 return false;
             }
         };
@@ -105,7 +102,7 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
-        public void openTradeGui(ServerPlayerEntity player) {
+        public void openTradeGui(ServerPlayer player) {
 
         }
 
@@ -115,7 +112,7 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
-        public int getMaxAmount(ServerPlayerEntity player) {
+        public int getMaxAmount(ServerPlayer player) {
             return 0;
         }
 
@@ -125,7 +122,7 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
-        protected void writeValueData(WriteView view) {
+        protected void writeValueData(ValueOutput view) {
 
         }
 
@@ -135,15 +132,15 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
-        public Text getStockName() {
-            return TextUtil.text("not_set").formatted(Formatting.RED);
+        public Component getStockName() {
+            return TextUtil.text("not_set").withStyle(ChatFormatting.RED);
         }
     }
 
     public static final class SingleItem extends StockHandler implements ItemModificatorGui.ItemStackHolder {
         public static final StockHandler.Definition   DEFINITION = new StockHandler.Definition  ("single_item", Items.NETHERITE_PICKAXE) {
             @Override
-            public StockHandler createFromData(ReadView view, TradeShopBlockEntity blockEntity) {
+            public StockHandler createFromData(ValueInput view, TradeShopBlockEntity blockEntity) {
                 return new SingleItem(this, view.read(ItemStack.MAP_CODEC).orElse(ItemStack.EMPTY), blockEntity);
             }
 
@@ -161,7 +158,7 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
-        public void openTradeGui(ServerPlayerEntity player) {
+        public void openTradeGui(ServerPlayer player) {
             new SingleItemShopGui(player, this.shop);
         }
 
@@ -181,9 +178,9 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
-        protected void writeValueData(WriteView view) {
+        protected void writeValueData(ValueOutput view) {
             if (!this.value.isEmpty()) {
-                view.put(ItemStack.MAP_CODEC, this.value);
+                view.store(ItemStack.MAP_CODEC, this.value);
             }
         }
 
@@ -193,11 +190,11 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
-        public Text getStockName() {
+        public Component getStockName() {
             return USUtil.asText(this.value);
         }
 
-        public int getMaxAmount(ServerPlayerEntity player) {
+        public int getMaxAmount(ServerPlayer player) {
             return this.shop.isAdmin() ? Integer.MAX_VALUE : transfer(true, (a) -> true) / this.value.getCount();
         }
 
@@ -217,14 +214,14 @@ public abstract class StockHandler extends GenericHandler {
         @Override
         public void setItemStack(ItemStack stack) {
             this.value = stack;
-            this.shop.markDirty();
+            this.shop.setChanged();
         }
     }
 
     public static final class SelectedItem extends StockHandler {
         public static final StockHandler.Definition   DEFINITION = new StockHandler.Definition  ("selected_item", Items.POTION) {
             @Override
-            public StockHandler createFromData(ReadView view, TradeShopBlockEntity blockEntity) {
+            public StockHandler createFromData(ValueInput view, TradeShopBlockEntity blockEntity) {
                 return new SelectedItem(this, blockEntity);
             }
 
@@ -240,7 +237,7 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
-        public void openTradeGui(ServerPlayerEntity player) {
+        public void openTradeGui(ServerPlayer player) {
             new AnyStackShopGui(player, this.shop);
         }
 
@@ -250,20 +247,20 @@ public abstract class StockHandler extends GenericHandler {
             if (container.isEmpty()) {
                 return GuiElements.HEAD_QUESTION_MARK.copy();
             } else {
-                var list = new ArrayList<ItemStack>(container.size());
-                for (int i = 0; i < container.size(); i++) {
-                    if (!container.getStack(i).isEmpty()) {
-                        list.add(container.getStack(i));
+                var list = new ArrayList<ItemStack>(container.getContainerSize());
+                for (int i = 0; i < container.getContainerSize(); i++) {
+                    if (!container.getItem(i).isEmpty()) {
+                        list.add(container.getItem(i));
                     }
                 }
 
-                return list.get((int) ((this.shop.getWorld().getTime() / 32) % list.size())).copy();
+                return list.get((int) ((this.shop.getLevel().getGameTime() / 32) % list.size())).copy();
             }
 
         }
 
         @Override
-        public int getMaxAmount(ServerPlayerEntity player) {
+        public int getMaxAmount(ServerPlayer player) {
             if (this.shop.isAdmin()) {
                 return Integer.MAX_VALUE;
             }
@@ -284,7 +281,7 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
-        protected void writeValueData(WriteView view) {
+        protected void writeValueData(ValueOutput view) {
 
         }
 
@@ -294,7 +291,7 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
-        public Text getStockName() {
+        public Component getStockName() {
             return TextUtil.text("select_anything");
         }
     }

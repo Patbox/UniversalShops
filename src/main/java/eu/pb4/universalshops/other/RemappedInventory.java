@@ -1,15 +1,15 @@
 package eu.pb4.universalshops.other;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
-public interface RemappedInventory extends Inventory {
-    Inventory getInventory();
+public interface RemappedInventory extends Container {
+    Container getInventory();
 
     @Override
-    default int size() {
-        return this.getInventory().size();
+    default int getContainerSize() {
+        return this.getInventory().getContainerSize();
     }
 
     @Override
@@ -18,42 +18,42 @@ public interface RemappedInventory extends Inventory {
     }
 
     @Override
-    default ItemStack getStack(int slot) {
-        return this.getInventory().getStack(slot);
+    default ItemStack getItem(int slot) {
+        return this.getInventory().getItem(slot);
     }
 
     @Override
-    default ItemStack removeStack(int slot, int amount) {
-        return this.getInventory().removeStack(slot, amount);
+    default ItemStack removeItem(int slot, int amount) {
+        return this.getInventory().removeItem(slot, amount);
     }
 
     @Override
-    default ItemStack removeStack(int slot) {
-        return this.getInventory().removeStack(slot);
+    default ItemStack removeItemNoUpdate(int slot) {
+        return this.getInventory().removeItemNoUpdate(slot);
     }
 
     @Override
-    default void setStack(int slot, ItemStack stack) {
-        this.getInventory().setStack(slot, stack);
+    default void setItem(int slot, ItemStack stack) {
+        this.getInventory().setItem(slot, stack);
     }
 
     @Override
-    default void markDirty() {
-        this.getInventory().markDirty();
+    default void setChanged() {
+        this.getInventory().setChanged();
     }
 
     @Override
-    default boolean canPlayerUse(PlayerEntity player) {
-        return this.getInventory().canPlayerUse(player);
+    default boolean stillValid(Player player) {
+        return this.getInventory().stillValid(player);
     }
 
     @Override
-    default void clear() {
-        this.getInventory().clear();
+    default void clearContent() {
+        this.getInventory().clearContent();
     }
 
     @Override
-    default int getMaxCountPerStack() {
-        return this.getInventory().getMaxCountPerStack();
+    default int getMaxStackSize() {
+        return this.getInventory().getMaxStackSize();
     }
 }

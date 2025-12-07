@@ -10,18 +10,17 @@ import eu.pb4.universalshops.gui.GuiElements;
 import eu.pb4.universalshops.other.USUtil;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
 
 public class AnyStackShopGui extends BaseShopGui {
     private int tick = 0;
@@ -31,8 +30,8 @@ public class AnyStackShopGui extends BaseShopGui {
     private int page;
     private int lastBought;
 
-    public AnyStackShopGui(ServerPlayerEntity player, TradeShopBlockEntity blockEntity) {
-        super(ScreenHandlerType.GENERIC_9X6, player, blockEntity, GuiBackground.TAKE_ANY);
+    public AnyStackShopGui(ServerPlayer player, TradeShopBlockEntity blockEntity) {
+        super(MenuType.GENERIC_9x6, player, blockEntity, GuiBackground.TAKE_ANY);
 
         if (!hasTexture()) {
             for (int i = 0; i < 3; i++) {
@@ -69,9 +68,9 @@ public class AnyStackShopGui extends BaseShopGui {
         }
 
         var inv = this.be.getContainer();
-        var s = inv.size();
+        var s = inv.getContainerSize();
         for (var e : this.items) {
-            if (s < e.slot || e.itemStack != inv.getStack(e.slot)) {
+            if (s < e.slot || e.itemStack != inv.getItem(e.slot)) {
                 this.updateItems();
                 break;
             }
@@ -94,12 +93,12 @@ public class AnyStackShopGui extends BaseShopGui {
 
             ItemStack secondStack = item;
             if (!canBuy) {
-                List<Text> tooltip;
+                List<Component> tooltip;
 
                 try {
-                    tooltip = item.getTooltip(Item.TooltipContext.create(this.player.getEntityWorld()), this.player, TooltipType.Default.BASIC);
+                    tooltip = item.getTooltipLines(Item.TooltipContext.of(this.player.level()), this.player, TooltipFlag.Default.NORMAL);
                 } catch (Throwable e) {
-                    tooltip = List.of(item.getName());
+                    tooltip = List.of(item.getHoverName());
                 }
 
                 secondStack = new GuiElementBuilder(Items.BARRIER).setName(tooltip.remove(0)).setLore(tooltip).asStack();
@@ -111,8 +110,8 @@ public class AnyStackShopGui extends BaseShopGui {
             }, 12, false, GuiElement.EMPTY_CALLBACK));
 
             this.setSlot(2 * 9 + 1, GuiElements.priceMarker(this.be.priceHandler.getText(), List.of(
-                    Text.empty(),
-                    TextUtil.gui("max_stock_left", TextUtil.number(maxStockCount).formatted(Formatting.WHITE)).formatted(Formatting.YELLOW)
+                    Component.empty(),
+                    TextUtil.gui("max_stock_left", TextUtil.number(maxStockCount).withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.YELLOW)
                     )));
         }
 
@@ -122,8 +121,8 @@ public class AnyStackShopGui extends BaseShopGui {
     private void updateItems() {
         this.items.clear();
         var inv = this.be.getContainer();
-        for (var i = 0; i < inv.size(); i++) {
-            var stack = inv.getStack(i);
+        for (var i = 0; i < inv.getContainerSize(); i++) {
+            var stack = inv.getItem(i);
             if (!stack.isEmpty()) {
                 this.items.add(new BuyElement(stack, i));
             }
@@ -179,31 +178,31 @@ public class AnyStackShopGui extends BaseShopGui {
                 }
                 gui.lastBought = gui.tick;
 
-                if (admin || gui.getBE().getContainer().getStack(this.slot) == this.itemStack) {
+                if (admin || gui.getBE().getContainer().getItem(this.slot) == this.itemStack) {
                     var count = USUtil.canInsert(clickType.shift
-                            ? USUtil.copyInventory(gui.getPlayer().getInventory().getMainStacks())
-                            : new SimpleInventory(gui.getPlayer().currentScreenHandler.getCursorStack().copy()), this.itemStack, this.itemStack.getCount());
+                            ? USUtil.copyInventory(gui.getPlayer().getInventory().getNonEquipmentItems())
+                            : new SimpleContainer(gui.getPlayer().containerMenu.getCarried().copy()), this.itemStack, this.itemStack.getCount());
 
                     if (count) {
                         var paymentCheck = gui.be.priceHandler.payFor(gui.player, true);
                         if (paymentCheck.success()) {
-                            (clickType.shift ? USUtil.addToInventory(gui.player.getInventory().getMainStacks()) : USUtil.mergeIntoCursor(gui.player.currentScreenHandler)).test(this.itemStack.copy());
+                            (clickType.shift ? USUtil.addToInventory(gui.player.getInventory().getNonEquipmentItems()) : USUtil.mergeIntoCursor(gui.player.containerMenu)).test(this.itemStack.copy());
                             if (!admin) {
                                 this.itemStack.setCount(0);
-                                gui.be.getContainer().setStack(this.slot, ItemStack.EMPTY);
+                                gui.be.getContainer().setItem(this.slot, ItemStack.EMPTY);
                             }
                             gui.playClickSound();
                             gui.updateValueDisplays();
                             gui.markDirty();
                         } else {
                             gui.playDismissSound();
-                            gui.player.sendMessage(TextUtil.prefix(Text.empty().append(paymentCheck.failureMessage()).formatted(Formatting.RED)));
-                            gui.setTempTitle(Text.empty().append(paymentCheck.failureMessage()).formatted(Formatting.DARK_RED));
+                            gui.player.sendSystemMessage(TextUtil.prefix(Component.empty().append(paymentCheck.failureMessage()).withStyle(ChatFormatting.RED)));
+                            gui.setTempTitle(Component.empty().append(paymentCheck.failureMessage()).withStyle(ChatFormatting.DARK_RED));
                         }
                     } else {
                         var text = TextUtil.text(clickType.shift ? "not_enough_inventory_space" : "not_enough_stack_space");
-                        gui.player.sendMessage(TextUtil.prefix(text.copy().formatted(Formatting.RED)));
-                        gui.setTempTitle(text.formatted(Formatting.DARK_RED));
+                        gui.player.sendSystemMessage(TextUtil.prefix(text.copy().withStyle(ChatFormatting.RED)));
+                        gui.setTempTitle(text.withStyle(ChatFormatting.DARK_RED));
                         gui.playDismissSound();
                     }
                 }

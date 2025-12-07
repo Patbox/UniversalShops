@@ -4,19 +4,19 @@ import eu.pb4.sgui.api.GuiHelpers;
 import eu.pb4.sgui.api.gui.GuiInterface;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.MenuType;
 import org.jetbrains.annotations.Nullable;
 
 public class BaseShopGui extends SimpleGui implements ShopGui {
     public final TradeShopBlockEntity be;
-    private final Text texture;
+    private final Component texture;
     private int titleTimer = -1;
-    private Text realTitle = Text.empty();
+    private Component realTitle = Component.empty();
     private final GuiInterface previousGui;
 
-    public BaseShopGui(ScreenHandlerType type, ServerPlayerEntity player, TradeShopBlockEntity blockEntity, Text texture) {
+    public BaseShopGui(MenuType type, ServerPlayer player, TradeShopBlockEntity blockEntity, Component texture) {
         super(type, player, false);
         this.be = blockEntity;
         this.texture = texture;
@@ -32,12 +32,12 @@ public class BaseShopGui extends SimpleGui implements ShopGui {
         super.onTick();
     }
 
-    public void setTempTitle(Text text) {
+    public void setTempTitle(Component text) {
         this.titleTimer = 80;
         this.setTitle(texture(texture).append(text));
     }
 
-    public void setMainTitle(Text text) {
+    public void setMainTitle(Component text) {
         this.realTitle = texture(texture).append(text);
         if (this.titleTimer < 0) {
             this.setTitle(this.realTitle);

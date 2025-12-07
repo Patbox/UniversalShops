@@ -5,52 +5,55 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polymer.core.api.block.PolymerHeadBlock;
 import net.fabricmc.fabric.api.block.BlockAttackInteractionAware;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.PlayerWallHeadBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.packettweaker.PacketContext;
 
-public class TradeShopBlock extends BlockWithEntity implements PolymerHeadBlock, BlockAttackInteractionAware {
-    public static Property<Direction> ATTACHED = EnumProperty.of("attachment", Direction.class, (x) -> x != Direction.UP);
+public class TradeShopBlock extends BaseEntityBlock implements PolymerHeadBlock, BlockAttackInteractionAware {
+    public static Property<Direction> ATTACHED = EnumProperty.create("attachment", Direction.class, (x) -> x != Direction.UP);
     public final boolean isAdmin;
 
     public static final MapCodec<TradeShopBlock> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.BOOL.fieldOf("is_admin").forGetter(x -> x.isAdmin),
-            createSettingsCodec()
+            propertiesCodec()
     ).apply(instance, TradeShopBlock::new));
 
-    protected TradeShopBlock(boolean isAdmin, Settings settings) {
+    protected TradeShopBlock(boolean isAdmin, Properties settings) {
         super(settings);
         this.isAdmin = isAdmin;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(ATTACHED);
     }
 
     @Override
-    public float calcBlockBreakingDelta(BlockState state, PlayerEntity player, BlockView world, BlockPos pos) {
+    public float getDestroyProgress(BlockState state, Player player, BlockGetter world, BlockPos pos) {
         if (world.getBlockEntity(pos) instanceof TradeShopBlockEntity shop && shop.isOwner(player) && shop.priceHandler.canSwitch()) {
-            return super.calcBlockBreakingDelta(state, player, world, pos);
+            return super.getDestroyProgress(state, player, world, pos);
         }
 
         return -1;
@@ -58,17 +61,17 @@ public class TradeShopBlock extends BlockWithEntity implements PolymerHeadBlock,
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        var face = ctx.getSide().getOpposite();
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        var face = ctx.getClickedFace().getOpposite();
         if (face == Direction.UP) {
             face = Direction.DOWN;
         }
-        return this.getDefaultState().with(ATTACHED, face);
+        return this.defaultBlockState().setValue(ATTACHED, face);
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new TradeShopBlockEntity(pos, state);
     }
 
@@ -81,43 +84,43 @@ public class TradeShopBlock extends BlockWithEntity implements PolymerHeadBlock,
 
     @Override
     public BlockState getPolymerBlockState(BlockState state, PacketContext context) {
-        var dir = state.get(ATTACHED);
+        var dir = state.getValue(ATTACHED);
 
         if (dir == Direction.DOWN) {
-            return Blocks.PLAYER_HEAD.getDefaultState();
+            return Blocks.PLAYER_HEAD.defaultBlockState();
         } else {
-            return Blocks.PLAYER_WALL_HEAD.getDefaultState().with(WallPlayerSkullBlock.FACING, dir.getOpposite());
+            return Blocks.PLAYER_WALL_HEAD.defaultBlockState().setValue(PlayerWallHeadBlock.FACING, dir.getOpposite());
         }
     }
 
     @Override
-    public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
-        world.updateComparators(pos, this);
-        super.onStateReplaced(state, world, pos,  moved);
+    public void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean moved) {
+        world.updateNeighbourForOutputSignal(pos, this);
+        super.affectNeighborsAfterRemoval(state, world, pos,  moved);
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (player instanceof ServerPlayerEntity serverPlayer && world.getBlockEntity(pos) instanceof TradeShopBlockEntity be) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        if (player instanceof ServerPlayer serverPlayer && world.getBlockEntity(pos) instanceof TradeShopBlockEntity be) {
             be.openGui(serverPlayer);
-            return ActionResult.SUCCESS_SERVER;
+            return InteractionResult.SUCCESS_SERVER;
         }
 
-        return super.onUse(state, world, pos, player, hit);
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return type == USRegistry.BLOCK_ENTITY_TYPE && world instanceof ServerWorld ? this::tick : null;
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+        return type == USRegistry.BLOCK_ENTITY_TYPE && world instanceof ServerLevel ? this::tick : null;
     }
 
-    private <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T t) {
+    private <T extends BlockEntity> void tick(Level world, BlockPos pos, BlockState state, T t) {
         ((TradeShopBlockEntity) t).tick();
     }
 
     @Override
-    public boolean onAttackInteraction(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, Direction direction) {
+    public boolean onAttackInteraction(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, Direction direction) {
         if (world.getBlockEntity(pos) instanceof TradeShopBlockEntity shop && shop.isOwner(player) && shop.priceHandler.canSwitch()) {
             return false;
         }
@@ -126,7 +129,7 @@ public class TradeShopBlock extends BlockWithEntity implements PolymerHeadBlock,
     }
 
     @Override
-    protected MapCodec<? extends BlockWithEntity> getCodec() {
+    protected MapCodec<? extends BaseEntityBlock> codec() {
         return CODEC;
     }
 }

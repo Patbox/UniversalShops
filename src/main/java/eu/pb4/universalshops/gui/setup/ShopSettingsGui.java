@@ -8,20 +8,19 @@ import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
 import eu.pb4.universalshops.trade.PriceHandler;
 import eu.pb4.universalshops.trade.StockHandler;
-import net.minecraft.item.Items;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
 import java.util.ArrayList;
 import java.util.Locale;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.Items;
 
 
 public class ShopSettingsGui extends BaseShopGui {
-    public ShopSettingsGui(ServerPlayerEntity player, TradeShopBlockEntity be) {
-        super(ScreenHandlerType.GENERIC_9X3, player, be, GuiBackground.SETTINGS);
+    public ShopSettingsGui(ServerPlayer player, TradeShopBlockEntity be) {
+        super(MenuType.GENERIC_9x3, player, be, GuiBackground.SETTINGS);
         this.setMainTitle(TextUtil.gui("shop.settings"));
 
         this.setSlot(9 * 2 + 3 + 2, GuiElements.BACK);
@@ -42,15 +41,15 @@ public class ShopSettingsGui extends BaseShopGui {
 
     private void updateHopper() {
         var x = new GuiElementBuilder(Items.HOPPER)
-                .setName(TextUtil.gui("setup.allow_hoppers", ScreenTexts.onOrOff(this.be.allowHoppers).copy().formatted(Formatting.YELLOW)).formatted(Formatting.WHITE))
-                .addLoreLine(Text.empty())
-                .addLoreLine(Text.empty()
-                        .append(Text.literal("» ").formatted(Formatting.DARK_GRAY))
-                        .append(TextUtil.gui("setup.click_to_change_mode.1")).formatted(Formatting.GRAY)
+                .setName(TextUtil.gui("setup.allow_hoppers", CommonComponents.optionStatus(this.be.allowHoppers).copy().withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.WHITE))
+                .addLoreLine(Component.empty())
+                .addLoreLine(Component.empty()
+                        .append(Component.literal("» ").withStyle(ChatFormatting.DARK_GRAY))
+                        .append(TextUtil.gui("setup.click_to_change_mode.1")).withStyle(ChatFormatting.GRAY)
                 )
-                .addLoreLine(Text.empty()
-                        .append(Text.literal("   ").formatted(Formatting.DARK_GRAY))
-                        .append(TextUtil.gui("setup.click_to_change_mode.2")).formatted(Formatting.GRAY)
+                .addLoreLine(Component.empty()
+                        .append(Component.literal("   ").withStyle(ChatFormatting.DARK_GRAY))
+                        .append(TextUtil.gui("setup.click_to_change_mode.2")).withStyle(ChatFormatting.GRAY)
                 )
                 .hideDefaultTooltip()
                 .setCallback((a, type, c, d) -> {
@@ -69,15 +68,15 @@ public class ShopSettingsGui extends BaseShopGui {
 
     private void updateHologram() {
         this.setSlot(9 * 2 + 3, new GuiElementBuilder(Items.NAME_TAG)
-                .setName(TextUtil.gui("setup.hologram", TextUtil.of("hologram_type", this.be.hologramMode.name().toLowerCase(Locale.ROOT)).formatted(Formatting.YELLOW)).formatted(Formatting.WHITE))
-                .addLoreLine(Text.empty())
-                .addLoreLine(Text.empty()
-                        .append(Text.literal("» ").formatted(Formatting.DARK_GRAY))
-                        .append(TextUtil.gui("setup.click_to_change_mode.1")).formatted(Formatting.GRAY)
+                .setName(TextUtil.gui("setup.hologram", TextUtil.of("hologram_type", this.be.hologramMode.name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.WHITE))
+                .addLoreLine(Component.empty())
+                .addLoreLine(Component.empty()
+                        .append(Component.literal("» ").withStyle(ChatFormatting.DARK_GRAY))
+                        .append(TextUtil.gui("setup.click_to_change_mode.1")).withStyle(ChatFormatting.GRAY)
                 )
-                .addLoreLine(Text.empty()
-                        .append(Text.literal("   ").formatted(Formatting.DARK_GRAY))
-                        .append(TextUtil.gui("setup.click_to_change_mode.2")).formatted(Formatting.GRAY)
+                .addLoreLine(Component.empty()
+                        .append(Component.literal("   ").withStyle(ChatFormatting.DARK_GRAY))
+                        .append(TextUtil.gui("setup.click_to_change_mode.2")).withStyle(ChatFormatting.GRAY)
                 )
                 .hideDefaultTooltip()
                 .setCallback((a, type, c, d) -> {
@@ -95,22 +94,22 @@ public class ShopSettingsGui extends BaseShopGui {
         var handler = this.be.priceHandler;
 
         var b = GuiElementBuilder.from(handler.definition().icon)
-                .setName(TextUtil.gui("setup.price_type", handler.definition().displayName.copy().formatted(Formatting.YELLOW)).formatted(Formatting.WHITE));
+                .setName(TextUtil.gui("setup.price_type", handler.definition().displayName.copy().withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.WHITE));
 
         if (!handler.canSwitch()) {
-            b.addLoreLine(TextUtil.gui("setup.cant_change_pricehandler.1").formatted(Formatting.RED));
-            b.addLoreLine(TextUtil.gui("setup.cant_change_pricehandler.2").formatted(Formatting.RED));
+            b.addLoreLine(TextUtil.gui("setup.cant_change_pricehandler.1").withStyle(ChatFormatting.RED));
+            b.addLoreLine(TextUtil.gui("setup.cant_change_pricehandler.2").withStyle(ChatFormatting.RED));
         }
 
         this.setSlot(3, b
-                .addLoreLine(Text.empty())
-                .addLoreLine(Text.empty()
-                        .append(Text.literal("» ").formatted(Formatting.DARK_GRAY))
-                        .append(TextUtil.gui("setup.click_to_change_mode.1")).formatted(Formatting.GRAY)
+                .addLoreLine(Component.empty())
+                .addLoreLine(Component.empty()
+                        .append(Component.literal("» ").withStyle(ChatFormatting.DARK_GRAY))
+                        .append(TextUtil.gui("setup.click_to_change_mode.1")).withStyle(ChatFormatting.GRAY)
                 )
-                .addLoreLine(Text.empty()
-                        .append(Text.literal("   ").formatted(Formatting.DARK_GRAY))
-                        .append(TextUtil.gui("setup.click_to_change_mode.2")).formatted(Formatting.GRAY)
+                .addLoreLine(Component.empty()
+                        .append(Component.literal("   ").withStyle(ChatFormatting.DARK_GRAY))
+                        .append(TextUtil.gui("setup.click_to_change_mode.2")).withStyle(ChatFormatting.GRAY)
                 )
                 .hideDefaultTooltip()
                 .setCallback((a, type, c, d) -> {
@@ -144,22 +143,22 @@ public class ShopSettingsGui extends BaseShopGui {
     private void updateStock() {
         var handler = this.be.stockHandler;
         var b = GuiElementBuilder.from(handler.definition().icon)
-                .setName(TextUtil.gui("setup.stock_type", handler.definition().displayName.copy().formatted(Formatting.YELLOW)).formatted(Formatting.WHITE));
+                .setName(TextUtil.gui("setup.stock_type", handler.definition().displayName.copy().withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.WHITE));
 
         if (!handler.canSwitch()) {
-            b.addLoreLine(TextUtil.gui("setup.cant_change_pricehandler.1").formatted(Formatting.RED));
-            b.addLoreLine(TextUtil.gui("setup.cant_change_pricehandler.2").formatted(Formatting.RED));
+            b.addLoreLine(TextUtil.gui("setup.cant_change_pricehandler.1").withStyle(ChatFormatting.RED));
+            b.addLoreLine(TextUtil.gui("setup.cant_change_pricehandler.2").withStyle(ChatFormatting.RED));
         }
 
         this.setSlot(9 + 3, b
-                .addLoreLine(Text.empty())
-                .addLoreLine(Text.empty()
-                        .append(Text.literal("» ").formatted(Formatting.DARK_GRAY))
-                        .append(TextUtil.gui("setup.click_to_change_mode.1")).formatted(Formatting.GRAY)
+                .addLoreLine(Component.empty())
+                .addLoreLine(Component.empty()
+                        .append(Component.literal("» ").withStyle(ChatFormatting.DARK_GRAY))
+                        .append(TextUtil.gui("setup.click_to_change_mode.1")).withStyle(ChatFormatting.GRAY)
                 )
-                .addLoreLine(Text.empty()
-                        .append(Text.literal("   ").formatted(Formatting.DARK_GRAY))
-                        .append(TextUtil.gui("setup.click_to_change_mode.2")).formatted(Formatting.GRAY)
+                .addLoreLine(Component.empty()
+                        .append(Component.literal("   ").withStyle(ChatFormatting.DARK_GRAY))
+                        .append(TextUtil.gui("setup.click_to_change_mode.2")).withStyle(ChatFormatting.GRAY)
                 )
                 .hideDefaultTooltip()
                 .setCallback((a, type, c, d) -> {

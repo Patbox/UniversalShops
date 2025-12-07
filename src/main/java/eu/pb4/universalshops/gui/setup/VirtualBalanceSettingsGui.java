@@ -9,27 +9,27 @@ import eu.pb4.universalshops.gui.GuiElements;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
 import eu.pb4.universalshops.trade.PriceHandler;
-import net.minecraft.item.Items;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.Items;
 
 public class VirtualBalanceSettingsGui extends BaseShopGui {
     private final Controller controller;
     private List<EconomyCurrency> currencies = new ArrayList<>();
     private EconomyCurrency current;
 
-    public VirtualBalanceSettingsGui(ServerPlayerEntity player, TradeShopBlockEntity blockEntity, Controller controller) {
-        super(ScreenHandlerType.HOPPER, player, blockEntity, Text.empty());
+    public VirtualBalanceSettingsGui(ServerPlayer player, TradeShopBlockEntity blockEntity, Controller controller) {
+        super(MenuType.HOPPER, player, blockEntity, Component.empty());
         this.controller = controller;
         var id = this.controller.getCurrencyId();
-        this.current = id != null ? CommonEconomy.getCurrency(player.getEntityWorld().getServer(), id) : null;
+        this.current = id != null ? CommonEconomy.getCurrency(player.level().getServer(), id) : null;
         this.setSlot(1, GuiElements.FILLER);
         this.setSlot(3, GuiElements.FILLER);
         this.setSlot(4, GuiElements.BACK);
@@ -45,26 +45,26 @@ public class VirtualBalanceSettingsGui extends BaseShopGui {
     private void updateDynamic() {
         this.currencies.clear();
 
-        this.currencies.addAll(CommonEconomy.getCurrencies(this.player.getEntityWorld().getServer()));
+        this.currencies.addAll(CommonEconomy.getCurrencies(this.player.level().getServer()));
 
         var b = GuiElementBuilder.from((this.current == null ? GuiElements.HEAD_QUESTION_MARK : this.current.icon()).copy())
-                .setName(TextUtil.gui("setup.virtual_balance.currency", (this.current == null ? TextUtil.text("not_set") : this.current.name().copy()).formatted(Formatting.YELLOW)).formatted(Formatting.WHITE));
+                .setName(TextUtil.gui("setup.virtual_balance.currency", (this.current == null ? TextUtil.text("not_set") : this.current.name().copy()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.WHITE));
 
 
         if (!this.be.priceHandler.canSwitch()) {
-            b.addLoreLine(TextUtil.gui("setup.cant_change_pricehandler.1").formatted(Formatting.RED));
-            b.addLoreLine(TextUtil.gui("setup.cant_change_pricehandler.2").formatted(Formatting.RED));
+            b.addLoreLine(TextUtil.gui("setup.cant_change_pricehandler.1").withStyle(ChatFormatting.RED));
+            b.addLoreLine(TextUtil.gui("setup.cant_change_pricehandler.2").withStyle(ChatFormatting.RED));
         }
 
         this.setSlot(0, b
-                .addLoreLine(Text.empty())
-                .addLoreLine(Text.empty()
-                        .append(Text.literal("» ").formatted(Formatting.DARK_GRAY))
-                        .append(TextUtil.gui("setup.click_to_change_mode.1")).formatted(Formatting.GRAY)
+                .addLoreLine(Component.empty())
+                .addLoreLine(Component.empty()
+                        .append(Component.literal("» ").withStyle(ChatFormatting.DARK_GRAY))
+                        .append(TextUtil.gui("setup.click_to_change_mode.1")).withStyle(ChatFormatting.GRAY)
                 )
-                .addLoreLine(Text.empty()
-                        .append(Text.literal("   ").formatted(Formatting.DARK_GRAY))
-                        .append(TextUtil.gui("setup.click_to_change_mode.2")).formatted(Formatting.GRAY)
+                .addLoreLine(Component.empty()
+                        .append(Component.literal("   ").withStyle(ChatFormatting.DARK_GRAY))
+                        .append(TextUtil.gui("setup.click_to_change_mode.2")).withStyle(ChatFormatting.GRAY)
                 )
                 .hideDefaultTooltip()
                 .setCallback((a, type, c, d) -> {
@@ -83,7 +83,7 @@ public class VirtualBalanceSettingsGui extends BaseShopGui {
                 }));
 
         this.setSlot(2, new GuiElementBuilder(Items.SUNFLOWER)
-                .setName(TextUtil.gui("setup.virtual_balance.value", (this.current == null ? TextUtil.text("not_set") : this.current.formatValueText(((PriceHandler.VirtualBalance) this.be.priceHandler).cost, true).copy()).formatted(Formatting.YELLOW)).formatted(Formatting.WHITE))
+                .setName(TextUtil.gui("setup.virtual_balance.value", (this.current == null ? TextUtil.text("not_set") : this.current.formatValueText(((PriceHandler.VirtualBalance) this.be.priceHandler).cost, true).copy()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.WHITE))
                 .hideDefaultTooltip()
                 .setCallback((a, type, c, d) -> {
                     if (this.current == null) {

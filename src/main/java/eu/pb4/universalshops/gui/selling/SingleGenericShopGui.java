@@ -9,26 +9,24 @@ import eu.pb4.universalshops.gui.GuiBackground;
 import eu.pb4.universalshops.gui.GuiElements;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
 
 public abstract class SingleGenericShopGui extends BaseShopGui {
     private int tick = 0;
     private int maxStockCount;
     private int stockCount;
 
-    public SingleGenericShopGui(ServerPlayerEntity player, TradeShopBlockEntity blockEntity) {
-        super(ScreenHandlerType.GENERIC_9X3, player, blockEntity, GuiBackground.SINGLE_ITEM);
+    public SingleGenericShopGui(ServerPlayer player, TradeShopBlockEntity blockEntity) {
+        super(MenuType.GENERIC_9x3, player, blockEntity, GuiBackground.SINGLE_ITEM);
 
         if (!hasTexture()) {
             for (int i = 0; i < this.getSize(); i++) {
@@ -80,12 +78,12 @@ public abstract class SingleGenericShopGui extends BaseShopGui {
 
             ItemStack secondStack = item;
             if (!canBuy) {
-                List<Text> tooltip;
+                List<Component> tooltip;
 
                 try {
-                    tooltip = item.getTooltip(Item.TooltipContext.create(this.player.getEntityWorld()), this.player, TooltipType.Default.BASIC);
+                    tooltip = item.getTooltipLines(Item.TooltipContext.of(this.player.level()), this.player, TooltipFlag.Default.NORMAL);
                 } catch (Throwable e) {
-                    tooltip = List.of(item.getName());
+                    tooltip = List.of(item.getHoverName());
                 }
 
                 secondStack = new GuiElementBuilder(Items.BARRIER).setName(tooltip.remove(0)).setLore(tooltip).asStack();
@@ -98,8 +96,8 @@ public abstract class SingleGenericShopGui extends BaseShopGui {
 
             this.setSlot(2 * 9 + 2, GuiElements.priceMarker(this.be.priceHandler.getText(),
                     List.of(
-                            Text.empty(),
-                            TextUtil.gui("max_stock_left", TextUtil.number(maxStockCount).formatted(Formatting.WHITE)).formatted(Formatting.YELLOW)
+                            Component.empty(),
+                            TextUtil.gui("max_stock_left", TextUtil.number(maxStockCount).withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.YELLOW)
                     )));
         }
 
@@ -110,13 +108,13 @@ public abstract class SingleGenericShopGui extends BaseShopGui {
 
             ItemStack secondStack = item;
             if (!hasStock) {
-                List<Text> tooltip;
+                List<Component> tooltip;
 
                 try {
-                    tooltip = item.getTooltip(Item.TooltipContext.create(this.player.getEntityWorld()), this.player, TooltipType.Default.BASIC);
+                    tooltip = item.getTooltipLines(Item.TooltipContext.of(this.player.level()), this.player, TooltipFlag.Default.NORMAL);
                 } catch (Throwable e) {
                     tooltip = new ArrayList<>();
-                    tooltip.add(item.getName());
+                    tooltip.add(item.getHoverName());
                 }
 
                 secondStack = new GuiElementBuilder(Items.BARRIER).setName(tooltip.remove(0)).setLore(tooltip).asStack();
@@ -127,17 +125,17 @@ public abstract class SingleGenericShopGui extends BaseShopGui {
                     secondStack
             }, 12, false, this::buyItem));
             this.setSlot(2 * 9 + 6, GuiElements.itemMarker(this.getMainText(), List.of(
-                    Text.empty(),
-                    TextUtil.gui("stock_left", TextUtil.number(stockCount).formatted(Formatting.WHITE)).formatted(Formatting.YELLOW),
-                    Text.empty(),
-                    hasStock ? TextUtil.gui("click_to_buy").formatted(Formatting.GREEN) : TextUtil.gui("out_of_stock").formatted(Formatting.RED)
+                    Component.empty(),
+                    TextUtil.gui("stock_left", TextUtil.number(stockCount).withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.YELLOW),
+                    Component.empty(),
+                    hasStock ? TextUtil.gui("click_to_buy").withStyle(ChatFormatting.GREEN) : TextUtil.gui("out_of_stock").withStyle(ChatFormatting.RED)
             )));
         }
     }
 
-    protected abstract Text getMainText();
+    protected abstract Component getMainText();
 
-    protected abstract void buyItem(int i, ClickType clickType, SlotActionType slotActionType);
+    protected abstract void buyItem(int i, ClickType clickType, net.minecraft.world.inventory.ClickType slotActionType);
 
     @Override
     public TradeShopBlockEntity getBE() {

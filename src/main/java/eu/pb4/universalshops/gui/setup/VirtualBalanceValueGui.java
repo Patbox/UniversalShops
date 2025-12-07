@@ -8,8 +8,8 @@ import eu.pb4.universalshops.gui.ShopGui;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
 import eu.pb4.universalshops.trade.PriceHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.server.level.ServerPlayer;
 
 public class VirtualBalanceValueGui extends AnvilInputGui implements ShopGui {
     private final PriceHandler.VirtualBalance handler;
@@ -17,7 +17,7 @@ public class VirtualBalanceValueGui extends AnvilInputGui implements ShopGui {
     private final GuiInterface previousGui;
     private boolean valid;
 
-    public VirtualBalanceValueGui(ServerPlayerEntity player, TradeShopBlockEntity be) {
+    public VirtualBalanceValueGui(ServerPlayer player, TradeShopBlockEntity be) {
         super(player, false);
         this.be = be;
         this.handler  = ((PriceHandler.VirtualBalance) be.priceHandler);
@@ -48,7 +48,7 @@ public class VirtualBalanceValueGui extends AnvilInputGui implements ShopGui {
             }
 
             if (this.valid) {
-                this.setTitle(TextUtil.gui("virtual_balance.cost.invalid_input").formatted(Formatting.RED));
+                this.setTitle(TextUtil.gui("virtual_balance.cost.invalid_input").withStyle(ChatFormatting.RED));
             }
 
             this.valid = false;
