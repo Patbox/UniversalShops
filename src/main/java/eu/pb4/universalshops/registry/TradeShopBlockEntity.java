@@ -158,7 +158,13 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
 
                 if (!hasStock) {
                     lines++;
-                    text.append("\n").append((this.getContainer() != EmptyInventory.INSTANCE ? TextUtil.gui("out_of_stock") : TextUtil.text("stock_missing")).withStyle(ChatFormatting.RED));
+                    text.append("\n");
+                    if (this.stockHandler.definition.type.equals("virtual_balance")) {
+                        text.append(TextUtil.text("virtual_money.not_enough_money_owner").withStyle(ChatFormatting.RED));
+                    } else {
+                        text.append((this.getContainer() != EmptyInventory.INSTANCE ? TextUtil.gui("out_of_stock") : TextUtil.text("stock_missing")).withStyle(ChatFormatting.RED));
+
+                    }
                 }
                 this.textDisplay.setText(text);
                 this.itemDisplay.setTranslation(new Vector3f(0, 0.25f + 0.28f * lines, 0));

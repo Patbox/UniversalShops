@@ -54,6 +54,7 @@
   "text.universal_shops.virtual_money.cant_store": "Can't store balance!",
   "text.universal_shops.virtual_money.not_enough_money": "Transaction failed! %s",
   "text.universal_shops.virtual_money.no_account": "You don't have required account!",
+  "text.universal_shops.virtual_money.not_enough_money_owner": "Owner has insufficient funds!",
 
   "pricehandler.universal_shops.free": "Free",
   "pricehandler.universal_shops.items": "Item",
@@ -61,6 +62,7 @@
 
   "stockhandler.universal_shops.single_item": "Equal Item",
   "stockhandler.universal_shops.selected_item": "Any Stack",
+  "stockhandler.universal_shops.virtual_balance": "Balance",
 
   "hologram_type.universal_shops.full": "Full",
   "hologram_type.universal_shops.icon": "Icon only",
