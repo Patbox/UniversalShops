@@ -1,3 +1,5 @@
+This is my fork of Universal Shops! I wanted to add the ability to sell items to shops (particularly admin shops, but all shops work) so that my server can convert diamonds to currency and back again easily.
+
 # Universal Shops
 
 Universal Shops is a Fabric (and Quilt compatible) trade shop mod designed to be flexible
