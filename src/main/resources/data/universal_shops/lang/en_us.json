@@ -25,6 +25,7 @@
   "gui.universal_shops.setup.allow_hoppers": "Allow Hoppers: %s",
   "gui.universal_shops.setup.virtual_balance.currency": "Currency: %s",
   "gui.universal_shops.setup.virtual_balance.value": "Price: %s",
+  "gui.universal_shops.setup.enchanted_book_mode": "Enchanted Book Mode: %s",
   "gui.universal_shops.modifying_item.title": "Modifying item",
   "gui.universal_shops.modifying_item.stack_size": "Set Count: %s",
   "gui.universal_shops.modifying_item.stack_decrease": "Decrease Item Count",
@@ -72,6 +73,9 @@
 
   "hologram_position.universal_shops.top": "Top",
   "hologram_position.universal_shops.front": "Front",
+
+  "enchanted_book_mode.universal_shops.default": "Default",
+  "enchanted_book_mode.universal_shops.enchantment": "Enchantment",
 
   "block.universal_shops.trade_block": "Trade Shop",
   "block.universal_shops.admin_trade_block": "Admin Trade Shop",

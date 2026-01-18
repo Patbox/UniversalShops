@@ -10,6 +10,9 @@ import eu.pb4.universalshops.gui.setup.ShopSettingsGui;
 import eu.pb4.universalshops.other.*;
 import eu.pb4.universalshops.trade.PriceHandler;
 import eu.pb4.universalshops.trade.StockHandler;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.enchantment.Enchantment;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -53,6 +56,8 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     public HologramPosition hologramPosition = HologramPosition.TOP;
     private int[] cachedSlots = new int[0];
     private ElementHolder elementHolder;
+    public EnchantedBookMode enchantedBookMode = EnchantedBookMode.DEFAULT;
+    public int lines = 2;
 
     public TradeShopBlockEntity(BlockPos pos, BlockState state) {
         super(USRegistry.BLOCK_ENTITY_TYPE, pos, state);
@@ -80,6 +85,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
         view.putBoolean("AllowHoppers", this.allowHoppers);
         view.putString("HologramMode", this.hologramMode.name());
         view.putString("HologramPosition", this.hologramPosition.name());
+        view.putString("EnchantedBookMode", this.enchantedBookMode.name());
     }
 
     @Override
@@ -96,6 +102,11 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
         try {
             this.hologramPosition = HologramPosition.valueOf(view.getStringOr("HologramPosition",""));
         } catch (Throwable e) {
+
+        }
+        try {
+            this.enchantedBookMode = EnchantedBookMode.valueOf(view.getStringOr("EnchantedBookMode", ""));
+        } catch (Throwable e){
 
         }
 
@@ -165,13 +176,34 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
 
                 this.itemDisplay.setItem(this.stockHandler.icon());
 
-                int lines = 2;
-                var text = Component.empty()
-                        .append(this.stockHandler.getStockName())
-                        .append("\n")
-                        .append(TextUtil.text("price",
+                var text = Component.empty();
+                var stockName = this.stockHandler.getStockName();
+
+                if (this.stockHandler.definition.type.equals("single_item") && this.stockHandler.getValueItem().getItem().equals(Items.ENCHANTED_BOOK) && this.enchantedBookMode == EnchantedBookMode.ENCHANTMENT){
+                        var enchantmentsMap = this.stockHandler.getValueItem().get(DataComponents.STORED_ENCHANTMENTS);
+                        if (enchantmentsMap != null) {
+                            int lineCount = 0;
+                            for (Holder<Enchantment> enchantment : enchantmentsMap.keySet()) {
+                                lineCount++;
+                                text.append(Enchantment.getFullname(enchantment, enchantmentsMap.getLevel(enchantment)).getString());
+                                if (lineCount < enchantmentsMap.size()) {
+                                    text.append("\n");
+                                }
+                                this.lines = lineCount + 1;
+                            }
+                        }
+                        text.append("\n")
+                                .append(TextUtil.text("price",
                                 this.priceHandler.getText().copy().setStyle(Style.EMPTY.applyFormat(ChatFormatting.WHITE).withBold(false))
                         ).setStyle(Style.EMPTY.applyFormat(ChatFormatting.DARK_GREEN).withBold(true)));
+                } else {
+                    text.append(this.stockHandler.getStockName())
+                            .append("\n")
+                            .append(TextUtil.text("price",
+                                    this.priceHandler.getText().copy().setStyle(Style.EMPTY.applyFormat(ChatFormatting.WHITE).withBold(false))
+                            ).setStyle(Style.EMPTY.applyFormat(ChatFormatting.DARK_GREEN).withBold(true)));
+                    this.lines = 2;
+                }
 
                 if (!hasStock) {
                     lines++;
@@ -204,7 +236,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
 
                 itemDisplay.setItem(icon);
 
-                int lines = 1;
+                lines = 1;
                 var text = Component.empty().append(this.priceHandler.getText());
 
                 this.textDisplay.setText(text);
@@ -357,6 +389,11 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     public enum HologramPosition {
         TOP,
         FRONT
+    }
+
+    public enum EnchantedBookMode {
+        DEFAULT,
+        ENCHANTMENT
     }
 
 }

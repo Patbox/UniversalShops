@@ -11,13 +11,18 @@ import eu.pb4.universalshops.gui.selling.AnyStackShopGui;
 import eu.pb4.universalshops.gui.selling.CurrencyShopGui;
 import eu.pb4.universalshops.gui.selling.SingleItemShopGui;
 import eu.pb4.universalshops.gui.setup.ItemModificatorGui;
+import eu.pb4.universalshops.gui.setup.SelectItemGui;
 import eu.pb4.universalshops.gui.setup.VirtualBalanceSettingsGui;
 import eu.pb4.universalshops.other.USUtil;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
+import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.commands.data.DataCommands;
+import net.minecraft.util.StringUtil;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -63,6 +68,8 @@ public abstract class StockHandler extends GenericHandler {
     }
     
     public abstract Component getStockName();
+
+    public abstract ItemStack getValueItem();
 
     @Override
     public Component getText() {
@@ -114,6 +121,9 @@ public abstract class StockHandler extends GenericHandler {
         @Override
         public void openTradeGui(ServerPlayer player) {
 
+        }
+        public ItemStack getValueItem(){
+            return new ItemStack(Items.BARRIER);
         }
 
         @Override
@@ -199,6 +209,10 @@ public abstract class StockHandler extends GenericHandler {
             return true;
         }
 
+        public ItemStack getValueItem(){
+            return value;
+        }
+
         @Override
         public Component getStockName() {
             return USUtil.asText(this.value);
@@ -240,6 +254,10 @@ public abstract class StockHandler extends GenericHandler {
                 return new SelectedItem(this, blockEntity);
             }
         };
+
+        public ItemStack getValueItem(){
+            return new ItemStack(Items.BARRIER);
+        }
 
 
         protected SelectedItem(StockHandler.Definition   creator, TradeShopBlockEntity blockEntity) {
@@ -338,7 +356,9 @@ public abstract class StockHandler extends GenericHandler {
             this.currency = account;
             this.value = value;
         }
-
+        public ItemStack getValueItem(){
+            return new ItemStack(Items.BARRIER);
+        }
 
         @Override
         public void setValue(long value) {

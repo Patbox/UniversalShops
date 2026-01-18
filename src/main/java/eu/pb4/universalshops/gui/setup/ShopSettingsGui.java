@@ -1,7 +1,9 @@
 package eu.pb4.universalshops.gui.setup;
 
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
+import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.universalshops.gui.BaseShopGui;
+import eu.pb4.universalshops.gui.ExtraGui;
 import eu.pb4.universalshops.gui.GuiBackground;
 import eu.pb4.universalshops.gui.GuiElements;
 import eu.pb4.universalshops.other.TextUtil;
@@ -16,6 +18,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.core.Direction;
 
@@ -31,6 +34,10 @@ public class ShopSettingsGui extends BaseShopGui {
         this.updatePrice();
         this.updateHologram();
         this.updateHopper();
+
+
+            this.updateEnchantedBookMode();
+
 
         if(this.be.getBlockState().getValue(TradeShopBlock.ATTACHED) != Direction.DOWN) {
             this.updateHologramPosition();
@@ -170,6 +177,35 @@ public class ShopSettingsGui extends BaseShopGui {
                 }));
 
         this.setSlot(3 + 2, handler.getSetupElement());
+    }
+
+    private void updateEnchantedBookMode(){
+            var item = switch (this.be.enchantedBookMode){
+                case DEFAULT -> Items.BOOK;
+                case ENCHANTMENT ->  Items.ENCHANTED_BOOK;
+            };
+            this.setSlot(9 + 2, new GuiElementBuilder(item)
+                    .setName(TextUtil.gui("setup.enchanted_book_mode", TextUtil.of("enchanted_book_mode", this.be.enchantedBookMode.name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.WHITE))
+                    .addLoreLine(Component.empty())
+                    .addLoreLine(Component.empty()
+                            .append(Component.literal("» ").withStyle(ChatFormatting.DARK_GRAY))
+                            .append(TextUtil.gui("setup.click_to_change_mode.1")).withStyle(ChatFormatting.GRAY)
+                    )
+                    .addLoreLine(Component.empty()
+                            .append(Component.literal("   ").withStyle(ChatFormatting.DARK_GRAY))
+                            .append(TextUtil.gui("setup.click_to_change_mode.2")).withStyle(ChatFormatting.GRAY)
+                    )
+                    .hideDefaultTooltip()
+                    .setCallback((a, type, c, d) -> {
+                        int dir = type.shift ? -1 : 1;
+                        this.playClickSound();
+
+                        var size = TradeShopBlockEntity.EnchantedBookMode.values().length;
+                        this.be.enchantedBookMode = TradeShopBlockEntity.EnchantedBookMode.values()[((size + this.be.enchantedBookMode.ordinal() + dir) % size)];
+                        this.be.clearHologram();
+                        this.updateEnchantedBookMode();
+                        this.markDirty();
+                    }));
     }
 
     private void updateStock() {
