@@ -5,6 +5,7 @@ import eu.pb4.universalshops.gui.BaseShopGui;
 import eu.pb4.universalshops.gui.GuiBackground;
 import eu.pb4.universalshops.gui.GuiElements;
 import eu.pb4.universalshops.other.TextUtil;
+import eu.pb4.universalshops.registry.TradeShopBlock;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
 import eu.pb4.universalshops.trade.PriceHandler;
 import eu.pb4.universalshops.trade.StockHandler;
@@ -16,6 +17,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Items;
+import net.minecraft.core.Direction;
 
 
 public class ShopSettingsGui extends BaseShopGui {
@@ -29,6 +31,10 @@ public class ShopSettingsGui extends BaseShopGui {
         this.updatePrice();
         this.updateHologram();
         this.updateHopper();
+
+        if(this.be.getBlockState().getValue(TradeShopBlock.ATTACHED) != Direction.DOWN) {
+            this.updateHologramPosition();
+        }
 
         if (!hasTexture()) {
             while (this.getFirstEmptySlot() != -1) {
@@ -85,7 +91,33 @@ public class ShopSettingsGui extends BaseShopGui {
 
                     var size = TradeShopBlockEntity.HologramMode.values().length;
                     this.be.hologramMode = TradeShopBlockEntity.HologramMode.values()[((size + this.be.hologramMode.ordinal() + dir) % size)];
+                    this.be.clearHologram();
                     this.updateHologram();
+                    this.markDirty();
+                }));
+    }
+
+    private void updateHologramPosition() {
+        this.setSlot(9 * 2 + 2, new GuiElementBuilder(Items.COMPASS)
+                .setName(TextUtil.gui("setup.hologram_position", TextUtil.of("hologram_position", this.be.hologramPosition.name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.WHITE))
+                .addLoreLine(Component.empty())
+                .addLoreLine(Component.empty()
+                        .append(Component.literal("» ").withStyle(ChatFormatting.DARK_GRAY))
+                        .append(TextUtil.gui("setup.click_to_change_mode.1")).withStyle(ChatFormatting.GRAY)
+                )
+                .addLoreLine(Component.empty()
+                        .append(Component.literal("   ").withStyle(ChatFormatting.DARK_GRAY))
+                        .append(TextUtil.gui("setup.click_to_change_mode.2")).withStyle(ChatFormatting.GRAY)
+                )
+                .hideDefaultTooltip()
+                .setCallback((a, type, c, d) -> {
+                    int dir = type.shift ? -1 : 1;
+                    this.playClickSound();
+
+                    var size = TradeShopBlockEntity.HologramPosition.values().length;
+                    this.be.hologramPosition = TradeShopBlockEntity.HologramPosition.values()[((size + this.be.hologramPosition.ordinal() + dir) % size)];
+                    this.be.clearHologram();
+                    this.updateHologramPosition();
                     this.markDirty();
                 }));
     }

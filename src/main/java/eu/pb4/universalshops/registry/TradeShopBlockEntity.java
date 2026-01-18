@@ -50,6 +50,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     @Nullable
     public GameProfile owner;
     public HologramMode hologramMode = HologramMode.FULL;
+    public HologramPosition hologramPosition = HologramPosition.TOP;
     private int[] cachedSlots = new int[0];
     private ElementHolder elementHolder;
 
@@ -78,6 +79,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
         this.stockHandler.writeData(view);
         view.putBoolean("AllowHoppers", this.allowHoppers);
         view.putString("HologramMode", this.hologramMode.name());
+        view.putString("HologramPosition", this.hologramPosition.name());
     }
 
     @Override
@@ -88,6 +90,11 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
             this.owner = view.read("Owner", CompoundTag.CODEC).map(LegacyNbtHelper::toGameProfile).orElse(null);
         try {
             this.hologramMode = HologramMode.valueOf(view.getStringOr("HologramMode", ""));
+        } catch (Throwable e) {
+
+        }
+        try {
+            this.hologramPosition = HologramPosition.valueOf(view.getStringOr("HologramPosition",""));
         } catch (Throwable e) {
 
         }
@@ -104,6 +111,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
 
         }
         this.allowHoppers = view.getBooleanOr("AllowHoppers", false);
+        this.clearHologram();
     }
 
     public void tick() {
@@ -121,8 +129,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     private void tickHolo() {
         if (this.hologramMode == HologramMode.DISABLED) {
             if (this.elementHolder != null) {
-                this.elementHolder.destroy();
-                this.elementHolder = null;
+                this.clearHologram();
             }
             return;
         }
@@ -130,8 +137,18 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
         if (elementHolder == null) {
             var dir = this.getBlockState().getValue(TradeShopBlock.ATTACHED);
             var pos = Vec3.upFromBottomCenterOf(this.getBlockPos(), dir == Direction.DOWN ? 0.6 : 0.8);
+            var verticalOffset = switch(hologramMode){
+                case DISABLED -> 0;
+                case FULL -> 0.4;
+                case COMPACT -> 0.3;
+                case ICON -> 0.25;
+            };
             if (dir != Direction.DOWN) {
-                pos = pos.add(dir.getStepX() * 0.25, 0, dir.getStepZ() * 0.25);
+                if (hologramPosition == HologramPosition.FRONT) {
+                    pos = pos.add(dir.getStepX() * (-0.3), (-0.25) - verticalOffset, dir.getStepZ() * (-0.3));
+                } else {
+                    pos = pos.add(dir.getStepX() * 0.25, 0, dir.getStepZ() * 0.25);
+                }
             }
             elementHolder = new ElementHolder();
 
@@ -167,6 +184,30 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
                     }
                 }
                 this.textDisplay.setText(text);
+
+                this.itemDisplay.setTranslation(new Vector3f(0, 0.25f + 0.28f * lines, 0));
+
+                if (this.itemDisplay.getHolder() != elementHolder) {
+                    elementHolder.addElement(this.itemDisplay);
+                }
+
+                if (this.textDisplay.getHolder() != elementHolder) {
+                    elementHolder.addElement(this.textDisplay);
+                }
+
+            } else if(this.hologramMode == HologramMode.COMPACT) {
+                if ((this.level.getGameTime() % 12) != 0) {
+                    return;
+                }
+
+                var icon = this.stockHandler.getMaxAmount(null) != 0 || ((this.level.getGameTime() / 12) & 2) == 0 ? this.stockHandler.icon() : Items.BARRIER.getDefaultInstance();
+
+                itemDisplay.setItem(icon);
+
+                int lines = 1;
+                var text = Component.empty().append(this.priceHandler.getText());
+
+                this.textDisplay.setText(text);
                 this.itemDisplay.setTranslation(new Vector3f(0, 0.25f + 0.28f * lines, 0));
 
                 if (this.itemDisplay.getHolder() != elementHolder) {
@@ -181,7 +222,6 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
                 if ((this.level.getGameTime() % 12) != 0) {
                     return;
                 }
-
                 var icon = this.stockHandler.getMaxAmount(null) != 0 || ((this.level.getGameTime() / 12) & 2) == 0 ? this.stockHandler.icon() : Items.BARRIER.getDefaultInstance();
 
                 itemDisplay.setItem(icon);
@@ -271,6 +311,13 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
         return ((TradeShopBlock) this.getBlockState().getBlock()).isAdmin;
     }
 
+    public void clearHologram(){
+        if (this.elementHolder != null) {
+            this.elementHolder.destroy();
+            this.elementHolder = null;
+        }
+    }
+
     @Override
     public Container getInventory() {
         return this.allowHoppers ? this.priceHandler.getInventory() : EmptyInventory.INSTANCE;
@@ -302,8 +349,14 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
 
     public enum HologramMode {
         FULL,
+        COMPACT,
         ICON,
         DISABLED
+    }
+
+    public enum HologramPosition {
+        TOP,
+        FRONT
     }
 
 }

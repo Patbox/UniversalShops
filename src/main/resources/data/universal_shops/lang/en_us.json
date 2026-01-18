@@ -21,6 +21,7 @@
   "gui.universal_shops.setup.price_type": "Price Type: %s",
   "gui.universal_shops.setup.stock_type": "Stock Type: %s",
   "gui.universal_shops.setup.hologram": "Hologram: %s",
+  "gui.universal_shops.setup.hologram_position": "Hologram Position: %s",
   "gui.universal_shops.setup.allow_hoppers": "Allow Hoppers: %s",
   "gui.universal_shops.setup.virtual_balance.currency": "Currency: %s",
   "gui.universal_shops.setup.virtual_balance.value": "Price: %s",
@@ -66,7 +67,11 @@
 
   "hologram_type.universal_shops.full": "Full",
   "hologram_type.universal_shops.icon": "Icon only",
+  "hologram_type.universal_shops.compact": "Compact",
   "hologram_type.universal_shops.disabled": "Disabled",
+
+  "hologram_position.universal_shops.top": "Top",
+  "hologram_position.universal_shops.front": "Front",
 
   "block.universal_shops.trade_block": "Trade Shop",
   "block.universal_shops.admin_trade_block": "Admin Trade Shop",
