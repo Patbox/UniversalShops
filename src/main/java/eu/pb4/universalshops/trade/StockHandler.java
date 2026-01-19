@@ -387,7 +387,7 @@ public abstract class StockHandler extends GenericHandler {
 
         @Override
         public Component getStockName() {
-            return this.getCurrency().formatValueText(this.getValue(), true);
+            return this.getCurrency().formatValueText(this.getValue(), false);
         }
 
         public EconomyCurrency getCurrency() {

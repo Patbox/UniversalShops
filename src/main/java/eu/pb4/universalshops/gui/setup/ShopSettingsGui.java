@@ -34,10 +34,7 @@ public class ShopSettingsGui extends BaseShopGui {
         this.updatePrice();
         this.updateHologram();
         this.updateHopper();
-
-
-            this.updateEnchantedBookMode();
-
+        this.updateEnchantedBookMode();
 
         if(this.be.getBlockState().getValue(TradeShopBlock.ATTACHED) != Direction.DOWN) {
             this.updateHologramPosition();

@@ -12,6 +12,7 @@ import eu.pb4.universalshops.trade.PriceHandler;
 import eu.pb4.universalshops.trade.StockHandler;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
@@ -177,7 +178,6 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
                 this.itemDisplay.setItem(this.stockHandler.icon());
 
                 var text = Component.empty();
-                var stockName = this.stockHandler.getStockName();
 
                 if (this.stockHandler.definition.type.equals("single_item") && this.stockHandler.getValueItem().getItem().equals(Items.ENCHANTED_BOOK) && this.enchantedBookMode == EnchantedBookMode.ENCHANTMENT){
                         var enchantmentsMap = this.stockHandler.getValueItem().get(DataComponents.STORED_ENCHANTMENTS);
@@ -194,13 +194,17 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
                         }
                         text.append("\n")
                                 .append(TextUtil.text("price",
-                                this.priceHandler.getText().copy().setStyle(Style.EMPTY.applyFormat(ChatFormatting.WHITE).withBold(false))
+                                        this.priceHandler.definition.type.equals("virtual_balance") ?
+                                                this.priceHandler.getText().copy().setStyle(this.priceHandler.getText().getStyle().withBold(false)) :
+                                                this.priceHandler.getText().copy().setStyle(Style.EMPTY.applyFormat(ChatFormatting.WHITE).withBold(false))
                         ).setStyle(Style.EMPTY.applyFormat(ChatFormatting.DARK_GREEN).withBold(true)));
                 } else {
                     text.append(this.stockHandler.getStockName())
                             .append("\n")
                             .append(TextUtil.text("price",
-                                    this.priceHandler.getText().copy().setStyle(Style.EMPTY.applyFormat(ChatFormatting.WHITE).withBold(false))
+                                    this.priceHandler.definition.type.equals("virtual_balance") ?
+                                            this.priceHandler.getText().copy().setStyle(this.priceHandler.getText().getStyle().withBold(false)) :
+                                            this.priceHandler.getText().copy().setStyle(Style.EMPTY.applyFormat(ChatFormatting.WHITE).withBold(false))
                             ).setStyle(Style.EMPTY.applyFormat(ChatFormatting.DARK_GREEN).withBold(true)));
                     this.lines = 2;
                 }
