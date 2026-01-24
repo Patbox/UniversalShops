@@ -12,7 +12,6 @@ import eu.pb4.universalshops.trade.PriceHandler;
 import eu.pb4.universalshops.trade.StockHandler;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.network.chat.TextColor;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
@@ -59,6 +58,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     private ElementHolder elementHolder;
     public EnchantedBookMode enchantedBookMode = EnchantedBookMode.DEFAULT;
     public int lines = 2;
+    private ShopSettingsGui openSettingsGui;
 
     public TradeShopBlockEntity(BlockPos pos, BlockState state) {
         super(USRegistry.BLOCK_ENTITY_TYPE, pos, state);
@@ -336,7 +336,15 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     }
 
     public void openSettings(ServerPlayer player) {
-        new ShopSettingsGui(player, this);
+        this.openSettingsGui = new ShopSettingsGui(player, this);
+    }
+
+    public ShopSettingsGui getSettingsGui(){
+        return this.openSettingsGui;
+    }
+
+    public void setSettingsGui(ShopSettingsGui shopSettingsGui){
+        this.openSettingsGui = shopSettingsGui;
     }
 
     public Component getTitle() {

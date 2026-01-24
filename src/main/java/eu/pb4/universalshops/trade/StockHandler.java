@@ -11,18 +11,12 @@ import eu.pb4.universalshops.gui.selling.AnyStackShopGui;
 import eu.pb4.universalshops.gui.selling.CurrencyShopGui;
 import eu.pb4.universalshops.gui.selling.SingleItemShopGui;
 import eu.pb4.universalshops.gui.setup.ItemModificatorGui;
-import eu.pb4.universalshops.gui.setup.SelectItemGui;
 import eu.pb4.universalshops.gui.setup.VirtualBalanceSettingsGui;
 import eu.pb4.universalshops.other.USUtil;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
-import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.commands.data.DataCommands;
-import net.minecraft.util.StringUtil;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.ItemEnchantments;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -195,6 +189,13 @@ public abstract class StockHandler extends GenericHandler {
         @Override
         public boolean isSetup() {
             return !this.value.isEmpty();
+        }
+
+        @Override
+        public void refreshGui() {
+            if (this.shop.getSettingsGui() != null) {
+                this.shop.getSettingsGui().refresh();
+            }
         }
 
         @Override

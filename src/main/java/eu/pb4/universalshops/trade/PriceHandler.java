@@ -226,6 +226,13 @@ public abstract class PriceHandler extends GenericHandler {
         }
 
         @Override
+        public void refreshGui() {
+            if (this.shop.getSettingsGui() != null) {
+                this.shop.getSettingsGui().refresh();
+            }
+        }
+
+        @Override
         public boolean canSwitch() {
             return this.currencyInventory.isEmpty();
         }

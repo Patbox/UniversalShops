@@ -1,11 +1,7 @@
 package eu.pb4.universalshops.gui.setup;
 
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
-import eu.pb4.sgui.api.elements.GuiElementInterface;
-import eu.pb4.universalshops.gui.BaseShopGui;
-import eu.pb4.universalshops.gui.ExtraGui;
-import eu.pb4.universalshops.gui.GuiBackground;
-import eu.pb4.universalshops.gui.GuiElements;
+import eu.pb4.universalshops.gui.*;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlock;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
@@ -18,7 +14,6 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.core.Direction;
 
@@ -30,15 +25,7 @@ public class ShopSettingsGui extends BaseShopGui {
 
         this.setSlot(9 * 2 + 3 + 2, GuiElements.BACK);
 
-        this.updateStock();
-        this.updatePrice();
-        this.updateHologram();
-        this.updateHopper();
-        this.updateEnchantedBookMode();
-
-        if(this.be.getBlockState().getValue(TradeShopBlock.ATTACHED) != Direction.DOWN) {
-            this.updateHologramPosition();
-        }
+        this.refresh();
 
         if (!hasTexture()) {
             while (this.getFirstEmptySlot() != -1) {
@@ -47,6 +34,23 @@ public class ShopSettingsGui extends BaseShopGui {
         }
 
         this.open();
+    }
+
+    public void refresh(){
+        this.updateStock();
+        this.updatePrice();
+        this.updateHologram();
+        this.updateHopper();
+        if(this.be.stockHandler.getValueItem().getItem().equals(Items.ENCHANTED_BOOK)){
+            this.updateEnchantedBookMode();
+        } else {
+            this.clearSlot(9 + 2);
+        }
+
+
+        if(this.be.getBlockState().getValue(TradeShopBlock.ATTACHED) != Direction.DOWN) {
+            this.updateHologramPosition();
+        }
     }
 
     private void updateHopper() {
