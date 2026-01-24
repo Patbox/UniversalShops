@@ -7,7 +7,11 @@ Trade Shop block for players and Admin Trade Shop for admins/map makers. Setup o
 
 It also checks against Common Protection API, to make sure player has access to source chests/containers.
 Using some Common Protection API compatible protection mod is suggested 
-(for example [GOML](https://modrinth.com/mod/goml-reserved) or [HTM](https://modrinth.com/mod/htm)).
+(for example [GOML](https://modrinth.com/project/j5niDupl), [HTM](https://modrinth.com/project/IEPAK5x6), or [CClaims](https://modrinth.com/project/BE77iyhG)).
+
+This mod supports the Common Economy API for buying and selling items for server currency. 
+Purchasing an item from a shop leaves the currency in the shop's GUI for collection by owner, while selling an item for currency takes currency directly out of its owner's account.
+You may wish to include a mod such as [Fuji](https://modrinth.com/project/1TowMm2v) to enable buying and selling items for currency.
 
 ![](https://imgur.com/VH7voGh.png)
 
@@ -37,6 +41,6 @@ To buy things you just click to open the shop and then take sold item. You can h
 to move it directly to your inventory!
 
 ## Download
-- [Modrinth](https://modrinth.com/mod/universal-shops)
+- [Modrinth](https://modrinth.com/project/cnIatHrN)
 - [Curseforge](https://www.curseforge.com/minecraft/mc-mods/universal-shops)
 - [Github Releases](https://github.com/Patbox/UniversalShops/releases)

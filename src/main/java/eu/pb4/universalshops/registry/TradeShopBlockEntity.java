@@ -10,6 +10,9 @@ import eu.pb4.universalshops.gui.setup.ShopSettingsGui;
 import eu.pb4.universalshops.other.*;
 import eu.pb4.universalshops.trade.PriceHandler;
 import eu.pb4.universalshops.trade.StockHandler;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.enchantment.Enchantment;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -50,8 +53,12 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     @Nullable
     public GameProfile owner;
     public HologramMode hologramMode = HologramMode.FULL;
+    public HologramPosition hologramPosition = HologramPosition.TOP;
     private int[] cachedSlots = new int[0];
     private ElementHolder elementHolder;
+    public EnchantedBookMode enchantedBookMode = EnchantedBookMode.DEFAULT;
+    public int lines = 2;
+    private ShopSettingsGui openSettingsGui;
 
     public TradeShopBlockEntity(BlockPos pos, BlockState state) {
         super(USRegistry.BLOCK_ENTITY_TYPE, pos, state);
@@ -78,6 +85,8 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
         this.stockHandler.writeData(view);
         view.putBoolean("AllowHoppers", this.allowHoppers);
         view.putString("HologramMode", this.hologramMode.name());
+        view.putString("HologramPosition", this.hologramPosition.name());
+        view.putString("EnchantedBookMode", this.enchantedBookMode.name());
     }
 
     @Override
@@ -89,6 +98,16 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
         try {
             this.hologramMode = HologramMode.valueOf(view.getStringOr("HologramMode", ""));
         } catch (Throwable e) {
+
+        }
+        try {
+            this.hologramPosition = HologramPosition.valueOf(view.getStringOr("HologramPosition",""));
+        } catch (Throwable e) {
+
+        }
+        try {
+            this.enchantedBookMode = EnchantedBookMode.valueOf(view.getStringOr("EnchantedBookMode", ""));
+        } catch (Throwable e){
 
         }
 
@@ -104,6 +123,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
 
         }
         this.allowHoppers = view.getBooleanOr("AllowHoppers", false);
+        this.clearHologram();
     }
 
     public void tick() {
@@ -121,8 +141,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     private void tickHolo() {
         if (this.hologramMode == HologramMode.DISABLED) {
             if (this.elementHolder != null) {
-                this.elementHolder.destroy();
-                this.elementHolder = null;
+                this.clearHologram();
             }
             return;
         }
@@ -130,8 +149,18 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
         if (elementHolder == null) {
             var dir = this.getBlockState().getValue(TradeShopBlock.ATTACHED);
             var pos = Vec3.upFromBottomCenterOf(this.getBlockPos(), dir == Direction.DOWN ? 0.6 : 0.8);
+            var verticalOffset = switch(hologramMode){
+                case DISABLED -> 0;
+                case FULL -> 0.4;
+                case COMPACT -> 0.3;
+                case ICON -> 0.25;
+            };
             if (dir != Direction.DOWN) {
-                pos = pos.add(dir.getStepX() * 0.25, 0, dir.getStepZ() * 0.25);
+                if (hologramPosition == HologramPosition.FRONT) {
+                    pos = pos.add(dir.getStepX() * (-0.3), (-0.25) - verticalOffset, dir.getStepZ() * (-0.3));
+                } else {
+                    pos = pos.add(dir.getStepX() * 0.25, 0, dir.getStepZ() * 0.25);
+                }
             }
             elementHolder = new ElementHolder();
 
@@ -148,18 +177,72 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
 
                 this.itemDisplay.setItem(this.stockHandler.icon());
 
-                int lines = 2;
-                var text = Component.empty()
-                        .append(this.stockHandler.getStockName())
-                        .append("\n")
-                        .append(TextUtil.text("price",
-                                this.priceHandler.getText().copy().setStyle(Style.EMPTY.applyFormat(ChatFormatting.WHITE).withBold(false))
+                var text = Component.empty();
+
+                if (this.stockHandler.definition.type.equals("single_item") && this.stockHandler.getValueItem().getItem().equals(Items.ENCHANTED_BOOK) && this.enchantedBookMode == EnchantedBookMode.ENCHANTMENT){
+                        var enchantmentsMap = this.stockHandler.getValueItem().get(DataComponents.STORED_ENCHANTMENTS);
+                        if (enchantmentsMap != null) {
+                            int lineCount = 0;
+                            for (Holder<Enchantment> enchantment : enchantmentsMap.keySet()) {
+                                lineCount++;
+                                text.append(Enchantment.getFullname(enchantment, enchantmentsMap.getLevel(enchantment)).getString());
+                                if (lineCount < enchantmentsMap.size()) {
+                                    text.append("\n");
+                                }
+                                this.lines = lineCount + 1;
+                            }
+                        }
+                        text.append("\n")
+                                .append(TextUtil.text("price",
+                                        this.priceHandler.definition.type.equals("virtual_balance") ?
+                                                this.priceHandler.getText().copy().setStyle(this.priceHandler.getText().getStyle().withBold(false)) :
+                                                this.priceHandler.getText().copy().setStyle(Style.EMPTY.applyFormat(ChatFormatting.WHITE).withBold(false))
                         ).setStyle(Style.EMPTY.applyFormat(ChatFormatting.DARK_GREEN).withBold(true)));
+                } else {
+                    text.append(this.stockHandler.getStockName())
+                            .append("\n")
+                            .append(TextUtil.text("price",
+                                    this.priceHandler.definition.type.equals("virtual_balance") ?
+                                            this.priceHandler.getText().copy().setStyle(this.priceHandler.getText().getStyle().withBold(false)) :
+                                            this.priceHandler.getText().copy().setStyle(Style.EMPTY.applyFormat(ChatFormatting.WHITE).withBold(false))
+                            ).setStyle(Style.EMPTY.applyFormat(ChatFormatting.DARK_GREEN).withBold(true)));
+                    this.lines = 2;
+                }
 
                 if (!hasStock) {
                     lines++;
-                    text.append("\n").append((this.getContainer() != EmptyInventory.INSTANCE ? TextUtil.gui("out_of_stock") : TextUtil.text("stock_missing")).withStyle(ChatFormatting.RED));
+                    text.append("\n");
+                    if (this.stockHandler.definition.type.equals("virtual_balance")) {
+                        text.append(TextUtil.text("virtual_money.not_enough_money_owner").withStyle(ChatFormatting.RED));
+                    } else {
+                        text.append((this.getContainer() != EmptyInventory.INSTANCE ? TextUtil.gui("out_of_stock") : TextUtil.text("stock_missing")).withStyle(ChatFormatting.RED));
+
+                    }
                 }
+                this.textDisplay.setText(text);
+
+                this.itemDisplay.setTranslation(new Vector3f(0, 0.25f + 0.28f * lines, 0));
+
+                if (this.itemDisplay.getHolder() != elementHolder) {
+                    elementHolder.addElement(this.itemDisplay);
+                }
+
+                if (this.textDisplay.getHolder() != elementHolder) {
+                    elementHolder.addElement(this.textDisplay);
+                }
+
+            } else if(this.hologramMode == HologramMode.COMPACT) {
+                if ((this.level.getGameTime() % 12) != 0) {
+                    return;
+                }
+
+                var icon = this.stockHandler.getMaxAmount(null) != 0 || ((this.level.getGameTime() / 12) & 2) == 0 ? this.stockHandler.icon() : Items.BARRIER.getDefaultInstance();
+
+                itemDisplay.setItem(icon);
+
+                lines = 1;
+                var text = Component.empty().append(this.priceHandler.getText());
+
                 this.textDisplay.setText(text);
                 this.itemDisplay.setTranslation(new Vector3f(0, 0.25f + 0.28f * lines, 0));
 
@@ -175,7 +258,6 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
                 if ((this.level.getGameTime() % 12) != 0) {
                     return;
                 }
-
                 var icon = this.stockHandler.getMaxAmount(null) != 0 || ((this.level.getGameTime() / 12) & 2) == 0 ? this.stockHandler.icon() : Items.BARRIER.getDefaultInstance();
 
                 itemDisplay.setItem(icon);
@@ -254,7 +336,15 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     }
 
     public void openSettings(ServerPlayer player) {
-        new ShopSettingsGui(player, this);
+        this.openSettingsGui = new ShopSettingsGui(player, this);
+    }
+
+    public ShopSettingsGui getSettingsGui(){
+        return this.openSettingsGui;
+    }
+
+    public void setSettingsGui(ShopSettingsGui shopSettingsGui){
+        this.openSettingsGui = shopSettingsGui;
     }
 
     public Component getTitle() {
@@ -263,6 +353,13 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
 
     public boolean isAdmin() {
         return ((TradeShopBlock) this.getBlockState().getBlock()).isAdmin;
+    }
+
+    public void clearHologram(){
+        if (this.elementHolder != null) {
+            this.elementHolder.destroy();
+            this.elementHolder = null;
+        }
     }
 
     @Override
@@ -296,8 +393,19 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
 
     public enum HologramMode {
         FULL,
+        COMPACT,
         ICON,
         DISABLED
+    }
+
+    public enum HologramPosition {
+        TOP,
+        FRONT
+    }
+
+    public enum EnchantedBookMode {
+        DEFAULT,
+        ENCHANTMENT
     }
 
 }

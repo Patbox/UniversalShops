@@ -9,6 +9,7 @@ import eu.pb4.universalshops.gui.GuiElements;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
 import eu.pb4.universalshops.trade.PriceHandler;
+import eu.pb4.universalshops.trade.StockHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -24,10 +25,12 @@ public class VirtualBalanceSettingsGui extends BaseShopGui {
     private final Controller controller;
     private List<EconomyCurrency> currencies = new ArrayList<>();
     private EconomyCurrency current;
+    private boolean price;
 
-    public VirtualBalanceSettingsGui(ServerPlayer player, TradeShopBlockEntity blockEntity, Controller controller) {
+    public VirtualBalanceSettingsGui(ServerPlayer player, TradeShopBlockEntity blockEntity, Controller controller, boolean price) {
         super(MenuType.HOPPER, player, blockEntity, Component.empty());
         this.controller = controller;
+        this.price = price;
         var id = this.controller.getCurrencyId();
         this.current = id != null ? CommonEconomy.getCurrency(player.level().getServer(), id) : null;
         this.setSlot(1, GuiElements.FILLER);
@@ -50,10 +53,16 @@ public class VirtualBalanceSettingsGui extends BaseShopGui {
         var b = GuiElementBuilder.from((this.current == null ? GuiElements.HEAD_QUESTION_MARK : this.current.icon()).copy())
                 .setName(TextUtil.gui("setup.virtual_balance.currency", (this.current == null ? TextUtil.text("not_set") : this.current.name().copy()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.WHITE));
 
-
-        if (!this.be.priceHandler.canSwitch()) {
-            b.addLoreLine(TextUtil.gui("setup.cant_change_pricehandler.1").withStyle(ChatFormatting.RED));
-            b.addLoreLine(TextUtil.gui("setup.cant_change_pricehandler.2").withStyle(ChatFormatting.RED));
+        if (price) {
+            if (!this.be.priceHandler.canSwitch()) {
+                b.addLoreLine(TextUtil.gui("setup.cant_change_pricehandler.1").withStyle(ChatFormatting.RED));
+                b.addLoreLine(TextUtil.gui("setup.cant_change_pricehandler.2").withStyle(ChatFormatting.RED));
+            }
+        } else {
+            if (!this.be.stockHandler.canSwitch()) {
+                b.addLoreLine(TextUtil.gui("setup.cant_change_pricehandler.1").withStyle(ChatFormatting.RED));
+                b.addLoreLine(TextUtil.gui("setup.cant_change_pricehandler.2").withStyle(ChatFormatting.RED));
+            }
         }
 
         this.setSlot(0, b
@@ -68,31 +77,56 @@ public class VirtualBalanceSettingsGui extends BaseShopGui {
                 )
                 .hideDefaultTooltip()
                 .setCallback((a, type, c, d) -> {
-                    if (!this.be.priceHandler.canSwitch()) {
-                        this.playDismissSound();
-                        return;
+                    if (price) {
+                        if (!this.be.priceHandler.canSwitch()) {
+                            this.playDismissSound();
+                            return;
+                        }
+                    } else {
+                        if (!this.be.stockHandler.canSwitch()) {
+                            this.playDismissSound();
+                            return;
+                        }
                     }
                     int dir = type.shift ? -1 : 1;
                     this.playClickSound();
 
                     var size = this.currencies.size();
                     this.current = this.currencies.get((size + this.currencies.indexOf(this.current) + dir) % size);
-                    ((PriceHandler.VirtualBalance) this.getBE().priceHandler).currency = this.current.id();
+                    if (price) {
+                        ((PriceHandler.VirtualBalance) this.getBE().priceHandler).currency = this.current.id();
+                    } else {
+                        ((StockHandler.VirtualBalance) this.getBE().stockHandler).currency = this.current.id();
+                    }
                     this.updateDynamic();
                     this.markDirty();
                 }));
 
-        this.setSlot(2, new GuiElementBuilder(Items.SUNFLOWER)
-                .setName(TextUtil.gui("setup.virtual_balance.value", (this.current == null ? TextUtil.text("not_set") : this.current.formatValueText(((PriceHandler.VirtualBalance) this.be.priceHandler).cost, true).copy()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.WHITE))
-                .hideDefaultTooltip()
-                .setCallback((a, type, c, d) -> {
-                    if (this.current == null) {
-                        this.playDismissSound();
-                        return;
-                    }
-                    this.playClickSound();
-                    new VirtualBalanceValueGui(this.player, this.be);
-                }));
+        if(price) {
+            this.setSlot(2, new GuiElementBuilder(Items.SUNFLOWER)
+                    .setName(TextUtil.gui("setup.virtual_balance.value", (this.current == null ? TextUtil.text("not_set") : this.current.formatValueText(((PriceHandler.VirtualBalance) this.be.priceHandler).cost, true).copy()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.WHITE))
+                    .hideDefaultTooltip()
+                    .setCallback((a, type, c, d) -> {
+                        if (this.current == null) {
+                            this.playDismissSound();
+                            return;
+                        }
+                        this.playClickSound();
+                        new VirtualBalanceValueGui(this.player, this.be, price);
+                    }));
+        } else {
+            this.setSlot(2, new GuiElementBuilder(Items.SUNFLOWER)
+                    .setName(TextUtil.gui("setup.virtual_balance.value", (this.current == null ? TextUtil.text("not_set") : this.current.formatValueText(((StockHandler.VirtualBalance) this.be.stockHandler).value, true).copy()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.WHITE))
+                    .hideDefaultTooltip()
+                    .setCallback((a, type, c, d) -> {
+                        if (this.current == null) {
+                            this.playDismissSound();
+                            return;
+                        }
+                        this.playClickSound();
+                        new VirtualBalanceValueGui(this.player, this.be, price);
+                    }));
+        }
     }
 
     public interface Controller {

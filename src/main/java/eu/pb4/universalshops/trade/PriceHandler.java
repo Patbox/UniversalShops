@@ -226,6 +226,13 @@ public abstract class PriceHandler extends GenericHandler {
         }
 
         @Override
+        public void refreshGui() {
+            if (this.shop.getSettingsGui() != null) {
+                this.shop.getSettingsGui().refresh();
+            }
+        }
+
+        @Override
         public boolean canSwitch() {
             return this.currencyInventory.isEmpty();
         }
@@ -374,7 +381,7 @@ public abstract class PriceHandler extends GenericHandler {
         private static final GuiElementInterface SETTINGS = new GuiElementBuilder(Items.GREEN_STAINED_GLASS_PANE).setName(TextUtil.text("configure")).setCallback((a, b, c, g) -> {
             if (g instanceof ShopGui gui) {
                 gui.playClickSound();
-                new VirtualBalanceSettingsGui(gui.getPlayer(), gui.getBE(), (VirtualBalanceSettingsGui.Controller) gui.getBE().priceHandler);
+                new VirtualBalanceSettingsGui(gui.getPlayer(), gui.getBE(), (VirtualBalanceSettingsGui.Controller) gui.getBE().priceHandler, true);
             }
         }).build();
         @Nullable

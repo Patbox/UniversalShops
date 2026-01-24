@@ -1,13 +1,22 @@
 package eu.pb4.universalshops.trade;
 
+import com.mojang.authlib.GameProfile;
+import eu.pb4.common.economy.api.CommonEconomy;
+import eu.pb4.common.economy.api.EconomyAccount;
+import eu.pb4.common.economy.api.EconomyCurrency;
+import eu.pb4.sgui.api.elements.GuiElementBuilder;
 import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.universalshops.gui.*;
 import eu.pb4.universalshops.gui.selling.AnyStackShopGui;
+import eu.pb4.universalshops.gui.selling.CurrencyShopGui;
 import eu.pb4.universalshops.gui.selling.SingleItemShopGui;
 import eu.pb4.universalshops.gui.setup.ItemModificatorGui;
+import eu.pb4.universalshops.gui.setup.VirtualBalanceSettingsGui;
 import eu.pb4.universalshops.other.USUtil;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -53,6 +62,8 @@ public abstract class StockHandler extends GenericHandler {
     }
     
     public abstract Component getStockName();
+
+    public abstract ItemStack getValueItem();
 
     @Override
     public Component getText() {
@@ -104,6 +115,9 @@ public abstract class StockHandler extends GenericHandler {
         @Override
         public void openTradeGui(ServerPlayer player) {
 
+        }
+        public ItemStack getValueItem(){
+            return new ItemStack(Items.BARRIER);
         }
 
         @Override
@@ -178,6 +192,13 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
+        public void refreshGui() {
+            if (this.shop.getSettingsGui() != null) {
+                this.shop.getSettingsGui().refresh();
+            }
+        }
+
+        @Override
         protected void writeValueData(ValueOutput view) {
             if (!this.value.isEmpty()) {
                 view.store(ItemStack.MAP_CODEC, this.value);
@@ -187,6 +208,10 @@ public abstract class StockHandler extends GenericHandler {
         @Override
         public boolean canSwitch() {
             return true;
+        }
+
+        public ItemStack getValueItem(){
+            return value;
         }
 
         @Override
@@ -230,6 +255,10 @@ public abstract class StockHandler extends GenericHandler {
                 return new SelectedItem(this, blockEntity);
             }
         };
+
+        public ItemStack getValueItem(){
+            return new ItemStack(Items.BARRIER);
+        }
 
 
         protected SelectedItem(StockHandler.Definition   creator, TradeShopBlockEntity blockEntity) {
@@ -296,9 +325,156 @@ public abstract class StockHandler extends GenericHandler {
         }
     }
 
+    public static final class VirtualBalance extends StockHandler implements VirtualBalanceSettingsGui.Controller {
+        public static final StockHandler.Definition DEFINITION = new StockHandler.Definition("virtual_balance", Items.SUNFLOWER) {
+            @Override
+            public StockHandler createFromData(ValueInput view, TradeShopBlockEntity blockEntity) {
+                return new StockHandler.VirtualBalance(this, Identifier.tryParse(view.getStringOr("Currency", "")),
+                        view.getLongOr("Value", 0), blockEntity);
+            }
+            @Override
+            public StockHandler createInitial(TradeShopBlockEntity blockEntity) {
+                return new VirtualBalance(this,null,0,blockEntity);
+            }
+            @Override
+            public boolean canUse(ServerPlayer player) {
+                return !CommonEconomy.getCurrencies(player.level().getServer()).isEmpty();
+            }
+        };
+        private static final GuiElementInterface SETTINGS = new GuiElementBuilder(Items.GREEN_STAINED_GLASS_PANE).setName(TextUtil.text("configure")).setCallback((a, b, c, g) -> {
+            if (g instanceof ShopGui gui) {
+                gui.playClickSound();
+                new VirtualBalanceSettingsGui(gui.getPlayer(), gui.getBE(), (VirtualBalanceSettingsGui.Controller) gui.getBE().stockHandler, false);
+            }
+        }).build();
+        @Nullable
+        public Identifier currency;
+        public long value;
+        public final WeakHashMap<GameProfile, Identifier> usedAccounts = new WeakHashMap<>();
+
+        protected VirtualBalance(StockHandler.Definition definition, Identifier account, long value, TradeShopBlockEntity blockEntity) {
+            super(definition,blockEntity);
+            this.currency = account;
+            this.value = value;
+        }
+        public ItemStack getValueItem(){
+            return new ItemStack(Items.BARRIER);
+        }
+
+        @Override
+        public void setValue(long value) {
+            this.value = value;
+        }
+
+        @Override
+        public long getValue() {
+            return this.value;
+        }
+
+        @Override
+        public void setCurrencyId(Identifier identifier) {
+            this.currency = identifier;
+        }
+
+        @Override
+        public Identifier getCurrencyId() {
+            return this.currency;
+        }
+
+        @Override
+        public void openTradeGui(ServerPlayer player) {
+            new CurrencyShopGui(player, this.shop);
+        }
+
+        @Override
+        public Component getStockName() {
+            return this.getCurrency().formatValueText(this.getValue(), false);
+        }
+
+        public EconomyCurrency getCurrency() {
+            return CommonEconomy.getCurrency(this.shop.getLevel().getServer(), this.currency);
+        }
+
+        @Override
+        public ItemStack icon() {
+            var ac = getCurrency();
+
+            if (ac != null) {
+                var icon = ac.icon();
+
+                icon.set(DataComponents.ITEM_NAME, ac.formatValueText(this.value,false));
+                return icon;
+            }
+
+            return GuiElements.HEAD_QUESTION_MARK.copy();
+        }
+
+        @Override
+        public boolean isSetup() {
+            return this.value > 0 && this.currency != null && (this.shop.owner != null || this.shop.isAdmin()) && getCurrency() != null;
+        }
+
+        @Override
+        protected void writeValueData(ValueOutput view) {
+            if (this.currency != null) {
+                view.putString("Currency", this.currency.toString());
+            }
+
+            view.putLong("Value", this.value);
+        }
+
+        @Override
+        public boolean canSwitch() {
+            return true;
+        }
+
+        @Override
+        public int getMaxAmount(ServerPlayer player) {
+            var ac = getOwnerAccount(this.shop.owner);
+            if (this.shop.isAdmin()) {
+                return Integer.MAX_VALUE;
+            }
+            if (ac != null) {
+                return (int) (ac.balance()/this.value);
+            }
+            return 0;
+        }
+
+        public EconomyAccount getOwnerAccount(GameProfile player) {
+            var identifier = this.usedAccounts.get(player);
+            if (identifier != null) {
+                var account = CommonEconomy.getAccount(this.shop.getLevel().getServer(), player, identifier);
+
+                if (account != null && account.currency() == this.getCurrency()) {
+                    return account;
+                }
+            }
+
+            return CommonEconomy.getAccounts(this.shop.getLevel().getServer(), player, this.getCurrency()).stream().sorted(Comparator.comparing(x -> -x.balance())).findFirst().orElse(null);
+        }
+
+        public EconomyAccount getPlayerAccount(ServerPlayer player) {
+            var identifier = this.usedAccounts.get(player);
+            if (identifier != null) {
+                var account = CommonEconomy.getAccount(player, identifier);
+
+                if (account != null && account.currency() == this.getCurrency()) {
+                    return account;
+                }
+            }
+
+            return CommonEconomy.getAccounts(player, this.getCurrency()).stream().sorted(Comparator.comparing(x -> -x.balance())).findFirst().orElse(null);
+        }
+        @Override
+        public GuiElementInterface getSetupElement() {
+            return SETTINGS;
+        }
+    }
+
     static {
         register(Invalid.DEFINITION);
         register(SingleItem.DEFINITION);
         register(SelectedItem.DEFINITION);
+        register(VirtualBalance.DEFINITION);
     }
 }

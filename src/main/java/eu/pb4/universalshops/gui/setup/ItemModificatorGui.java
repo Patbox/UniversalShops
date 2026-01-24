@@ -88,6 +88,7 @@ public class ItemModificatorGui extends SimpleGui implements ExtraGui {
                         gui.playClickSound();
                         var stack = gui.getPlayer().containerMenu.getCarried();
                         if (!stack.isEmpty()) {
+                            holder.refreshGui();
                             holder.setItemStack(stack.copy());
                         } else {
                             if (opensGui) {
@@ -96,6 +97,7 @@ public class ItemModificatorGui extends SimpleGui implements ExtraGui {
                                 new SelectItemGui(gui.getPlayer(), holder);
                             }
                         }
+                        holder.refreshGui();
                     }
                 };
             }
@@ -114,6 +116,7 @@ public class ItemModificatorGui extends SimpleGui implements ExtraGui {
     public interface ItemStackHolder {
         ItemStack getItemStack();
         void setItemStack(ItemStack stack);
+        void refreshGui();
     }
 }
 

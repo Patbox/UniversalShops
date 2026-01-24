@@ -1,10 +1,9 @@
 package eu.pb4.universalshops.gui.setup;
 
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
-import eu.pb4.universalshops.gui.BaseShopGui;
-import eu.pb4.universalshops.gui.GuiBackground;
-import eu.pb4.universalshops.gui.GuiElements;
+import eu.pb4.universalshops.gui.*;
 import eu.pb4.universalshops.other.TextUtil;
+import eu.pb4.universalshops.registry.TradeShopBlock;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
 import eu.pb4.universalshops.trade.PriceHandler;
 import eu.pb4.universalshops.trade.StockHandler;
@@ -16,6 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Items;
+import net.minecraft.core.Direction;
 
 
 public class ShopSettingsGui extends BaseShopGui {
@@ -25,10 +25,7 @@ public class ShopSettingsGui extends BaseShopGui {
 
         this.setSlot(9 * 2 + 3 + 2, GuiElements.BACK);
 
-        this.updateStock();
-        this.updatePrice();
-        this.updateHologram();
-        this.updateHopper();
+        this.refresh();
 
         if (!hasTexture()) {
             while (this.getFirstEmptySlot() != -1) {
@@ -37,6 +34,23 @@ public class ShopSettingsGui extends BaseShopGui {
         }
 
         this.open();
+    }
+
+    public void refresh(){
+        this.updateStock();
+        this.updatePrice();
+        this.updateHologram();
+        this.updateHopper();
+        if(this.be.stockHandler.getValueItem().getItem().equals(Items.ENCHANTED_BOOK)){
+            this.updateEnchantedBookMode();
+        } else {
+            this.clearSlot(9 + 2);
+        }
+
+
+        if(this.be.getBlockState().getValue(TradeShopBlock.ATTACHED) != Direction.DOWN) {
+            this.updateHologramPosition();
+        }
     }
 
     private void updateHopper() {
@@ -85,7 +99,33 @@ public class ShopSettingsGui extends BaseShopGui {
 
                     var size = TradeShopBlockEntity.HologramMode.values().length;
                     this.be.hologramMode = TradeShopBlockEntity.HologramMode.values()[((size + this.be.hologramMode.ordinal() + dir) % size)];
+                    this.be.clearHologram();
                     this.updateHologram();
+                    this.markDirty();
+                }));
+    }
+
+    private void updateHologramPosition() {
+        this.setSlot(9 * 2 + 2, new GuiElementBuilder(Items.COMPASS)
+                .setName(TextUtil.gui("setup.hologram_position", TextUtil.of("hologram_position", this.be.hologramPosition.name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.WHITE))
+                .addLoreLine(Component.empty())
+                .addLoreLine(Component.empty()
+                        .append(Component.literal("» ").withStyle(ChatFormatting.DARK_GRAY))
+                        .append(TextUtil.gui("setup.click_to_change_mode.1")).withStyle(ChatFormatting.GRAY)
+                )
+                .addLoreLine(Component.empty()
+                        .append(Component.literal("   ").withStyle(ChatFormatting.DARK_GRAY))
+                        .append(TextUtil.gui("setup.click_to_change_mode.2")).withStyle(ChatFormatting.GRAY)
+                )
+                .hideDefaultTooltip()
+                .setCallback((a, type, c, d) -> {
+                    int dir = type.shift ? -1 : 1;
+                    this.playClickSound();
+
+                    var size = TradeShopBlockEntity.HologramPosition.values().length;
+                    this.be.hologramPosition = TradeShopBlockEntity.HologramPosition.values()[((size + this.be.hologramPosition.ordinal() + dir) % size)];
+                    this.be.clearHologram();
+                    this.updateHologramPosition();
                     this.markDirty();
                 }));
     }
@@ -138,6 +178,35 @@ public class ShopSettingsGui extends BaseShopGui {
                 }));
 
         this.setSlot(3 + 2, handler.getSetupElement());
+    }
+
+    private void updateEnchantedBookMode(){
+            var item = switch (this.be.enchantedBookMode){
+                case DEFAULT -> Items.BOOK;
+                case ENCHANTMENT ->  Items.ENCHANTED_BOOK;
+            };
+            this.setSlot(9 + 2, new GuiElementBuilder(item)
+                    .setName(TextUtil.gui("setup.enchanted_book_mode", TextUtil.of("enchanted_book_mode", this.be.enchantedBookMode.name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.WHITE))
+                    .addLoreLine(Component.empty())
+                    .addLoreLine(Component.empty()
+                            .append(Component.literal("» ").withStyle(ChatFormatting.DARK_GRAY))
+                            .append(TextUtil.gui("setup.click_to_change_mode.1")).withStyle(ChatFormatting.GRAY)
+                    )
+                    .addLoreLine(Component.empty()
+                            .append(Component.literal("   ").withStyle(ChatFormatting.DARK_GRAY))
+                            .append(TextUtil.gui("setup.click_to_change_mode.2")).withStyle(ChatFormatting.GRAY)
+                    )
+                    .hideDefaultTooltip()
+                    .setCallback((a, type, c, d) -> {
+                        int dir = type.shift ? -1 : 1;
+                        this.playClickSound();
+
+                        var size = TradeShopBlockEntity.EnchantedBookMode.values().length;
+                        this.be.enchantedBookMode = TradeShopBlockEntity.EnchantedBookMode.values()[((size + this.be.enchantedBookMode.ordinal() + dir) % size)];
+                        this.be.clearHologram();
+                        this.updateEnchantedBookMode();
+                        this.markDirty();
+                    }));
     }
 
     private void updateStock() {
