@@ -1,8 +1,8 @@
 package eu.pb4.universalshops.gui.setup;
 
-import eu.pb4.sgui.api.GuiHelpers;
+import eu.pb4.sgui.api.SguiUtils;
 import eu.pb4.sgui.api.gui.AnvilInputGui;
-import eu.pb4.sgui.api.gui.GuiInterface;
+import eu.pb4.sgui.api.gui.GuiLike;
 import eu.pb4.universalshops.gui.GuiElements;
 import eu.pb4.universalshops.gui.ShopGui;
 import eu.pb4.universalshops.other.TextUtil;
@@ -14,7 +14,7 @@ import net.minecraft.server.level.ServerPlayer;
 public class VirtualBalanceValueGui extends AnvilInputGui implements ShopGui {
     private final PriceHandler.VirtualBalance handler;
     private final TradeShopBlockEntity be;
-    private final GuiInterface previousGui;
+    private final GuiLike previousGui;
     private boolean valid;
 
     public VirtualBalanceValueGui(ServerPlayer player, TradeShopBlockEntity be) {
@@ -27,7 +27,7 @@ public class VirtualBalanceValueGui extends AnvilInputGui implements ShopGui {
 
         this.setDefaultInputValue(x);
         this.onInput(x);
-        this.previousGui = GuiHelpers.getCurrentGui(player);
+        this.previousGui = SguiUtils.getCurrentGui(player);
         this.open();
     }
 
@@ -36,7 +36,7 @@ public class VirtualBalanceValueGui extends AnvilInputGui implements ShopGui {
         this.setDefaultInputValue(input);
 
         try {
-            this.handler.cost = this.handler.getCurrency().parseValue(input);
+            this.handler.cost = this.handler.getCurrency().parseValue(input).longValueExact();
             this.markDirty();
             if (!this.valid) {
                 this.setTitle(TextUtil.gui("virtual_balance.cost.title"));

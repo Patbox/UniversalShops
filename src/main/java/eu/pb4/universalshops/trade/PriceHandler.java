@@ -3,9 +3,10 @@ package eu.pb4.universalshops.trade;
 import eu.pb4.common.economy.api.CommonEconomy;
 import eu.pb4.common.economy.api.EconomyAccount;
 import eu.pb4.common.economy.api.EconomyCurrency;
+import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
-import eu.pb4.sgui.api.elements.GuiElementInterface;
-import eu.pb4.sgui.api.gui.GuiInterface;
+import eu.pb4.sgui.api.elements.GuiElementBuilderCreator;
+import eu.pb4.sgui.api.gui.GuiLike;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import eu.pb4.universalshops.gui.*;
 import eu.pb4.universalshops.gui.setup.ItemModificatorGui;
@@ -14,9 +15,13 @@ import eu.pb4.universalshops.other.EmptyInventory;
 import eu.pb4.universalshops.other.USUtil;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
+import net.minecraft.world.item.ItemStackTemplate;
 import org.jetbrains.annotations.Nullable;
 
+import java.math.BigInteger;
 import java.util.*;
+import java.util.function.Supplier;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -80,10 +85,10 @@ public abstract class PriceHandler extends GenericHandler {
 
     public static abstract class Definition extends GenericHandler.Definition<PriceHandler> {
         public Definition(String type, Item icon) {
-            this(type, TextUtil.of("pricehandler", type), icon.getDefaultInstance());
+            this(type, TextUtil.of("pricehandler", type), icon::getDefaultInstance);
         }
 
-        public Definition(String type, Component displayName, ItemStack icon) {
+        public Definition(String type, Component displayName, Supplier<ItemStack> icon) {
             super(type, displayName, icon);
         }
     }
@@ -99,7 +104,7 @@ public abstract class PriceHandler extends GenericHandler {
     }
 
     public static final class Invalid extends PriceHandler {
-        public static final PriceHandler.Definition DEFINITION = new PriceHandler.Definition("invalid", TextUtil.text("not_set"), GuiElements.HEAD_QUESTION_MARK) {
+        public static final PriceHandler.Definition DEFINITION = new PriceHandler.Definition("invalid", TextUtil.text("not_set"), GuiElements.HEAD_QUESTION_MARK::asStack) {
             @Override
             public PriceHandler createFromData(ValueInput view, TradeShopBlockEntity blockEntity) {
                 return new Invalid(this, blockEntity);
@@ -127,7 +132,7 @@ public abstract class PriceHandler extends GenericHandler {
 
         @Override
         public ItemStack icon() {
-            return GuiElements.HEAD_QUESTION_MARK.copy();
+            return GuiElements.HEAD_QUESTION_MARK.asStack();
         }
 
         @Override
@@ -169,17 +174,22 @@ public abstract class PriceHandler extends GenericHandler {
         };
 
         private ItemStack value;
-        public final SimpleContainer currencyInventory = new SimpleContainer(27);
+        public final SimpleContainer currencyInventory = new SimpleContainer(27) {
+            @Override
+            public void setChanged() {
+                super.setChanged();
+                SingleItem.this.shop.setChanged();
+            }
+        };
 
 
         protected SingleItem(PriceHandler.Definition  creator, ItemStack initialValue, TradeShopBlockEntity blockEntity) {
             super(creator, blockEntity);
             this.value = initialValue;
-            this.currencyInventory.addListener(blockEntity);
         }
 
         @Override
-        public GuiElementInterface getSetupElement() {
+        public GuiElement getSetupElement() {
             return ItemModificatorGui.stackHolderElement(this, true);
         }
 
@@ -202,16 +212,16 @@ public abstract class PriceHandler extends GenericHandler {
                 }
 
                 @Override
-                public void onClose() {
+                public void onManualClose() {
                     closeRunnable.run();
-                    super.onClose();
+                    super.onManualClose();
                 }
             };
 
             gui.setTitle(ExtraGui.texture(player, GuiBackground.SELECTOR).append(TextUtil.gui("shop.currency_storage")));
 
             for (int i = 0; i < this.currencyInventory.getContainerSize(); i++) {
-                gui.setSlotRedirect(i, new CurrencySlot(this.currencyInventory, i));
+                gui.setSlot(i, new CurrencySlot(this.currencyInventory, i));
             }
 
             if (!ExtraGui.hasTexture(player)) {
@@ -256,7 +266,7 @@ public abstract class PriceHandler extends GenericHandler {
             }
 
             return Result.failed(TextUtil.text(USUtil.canInsert(chest, this.value, this.value.getCount())  ? "not_enough_currency" : "not_enough_shop_storage_space",
-                    this.value.getHoverName().copy().withStyle(x -> x.withHoverEvent(new HoverEvent.ShowItem(this.value))),
+                    this.value.getHoverName().copy().withStyle(x -> this.value.isEmpty() ? x : x.withHoverEvent(new HoverEvent.ShowItem(ItemStackTemplate.fromNonEmptyStack(this.value)))),
                     this.value.getCount(), count));
         }
 
@@ -270,8 +280,8 @@ public abstract class PriceHandler extends GenericHandler {
         }
 
         @Override
-        public GuiElementInterface getAccessElement() {
-            return this.shop.isAdmin() ? GuiElements.FILLER : GuiElements.CURRENCY_INVENTORY;
+        public GuiElement getAccessElement() {
+            return this.shop.isAdmin() ? GuiElements.FILLER.build() : GuiElements.CURRENCY_INVENTORY.build();
         }
 
         @Override
@@ -337,7 +347,7 @@ public abstract class PriceHandler extends GenericHandler {
 
         @Override
         public ItemStack icon() {
-            var i = DEFINITION.icon.copy();
+            var i = DEFINITION.icon.get();
             i.set(DataComponents.ITEM_NAME, this.getText());
             return i;
         }
@@ -371,12 +381,12 @@ public abstract class PriceHandler extends GenericHandler {
                 return !CommonEconomy.getCurrencies(player.level().getServer()).isEmpty();
             }
         };
-        private static final GuiElementInterface SETTINGS = new GuiElementBuilder(Items.GREEN_STAINED_GLASS_PANE).setName(TextUtil.text("configure")).setCallback((a, b, c, g) -> {
+        private static final GuiElementBuilderCreator<?> SETTINGS = new GuiElementBuilder(Items.GREEN_STAINED_GLASS_PANE).setName(TextUtil.text("configure")).setCallback((a, b, c, g) -> {
             if (g instanceof ShopGui gui) {
                 gui.playClickSound();
                 new VirtualBalanceSettingsGui(gui.getPlayer(), gui.getBE(), (VirtualBalanceSettingsGui.Controller) gui.getBE().priceHandler);
             }
-        }).build();
+        });
         @Nullable
         public Identifier currency;
         public long cost;
@@ -399,7 +409,7 @@ public abstract class PriceHandler extends GenericHandler {
         public Component getText() {
             var ac = getCurrency();
 
-            return ac != null ? ac.formatValueText(this.cost, false) : Component.empty();
+            return ac != null ? ac.formatValueComponent(this.cost, false) : Component.empty();
         }
 
         public EconomyCurrency getCurrency() {
@@ -410,7 +420,7 @@ public abstract class PriceHandler extends GenericHandler {
         public int getMaxAmount(ServerPlayer player) {
             var ac = getSelectedAccount(player);
 
-            return ac != null ? (int) (ac.balance() / this.cost) : 0;
+            return ac != null ? (int) (ac.balance().divide(BigInteger.valueOf(this.cost)).intValue()) : 0;
         }
 
         @Override
@@ -445,24 +455,24 @@ public abstract class PriceHandler extends GenericHandler {
             if (ac != null) {
                 var icon = ac.icon();
 
-                icon.set(DataComponents.ITEM_NAME, ac.formatValueText(this.cost, false));
+                icon.set(DataComponents.ITEM_NAME, ac.formatValueComponent(this.cost, false));
 
                 return icon;
             }
 
-            return GuiElements.HEAD_QUESTION_MARK.copy();
+            return GuiElements.HEAD_QUESTION_MARK.asStack();
         }
 
         @Override
-        public GuiElementInterface getSetupElement() {
-            return SETTINGS;
+        public GuiElement getSetupElement() {
+            return SETTINGS.build();
         }
 
         @Override
-        public GuiElementInterface getAccessElement() {
+        public GuiElement getAccessElement() {
             return new GuiElementBuilder(Items.CHEST)
                     .setName(TextUtil.gui("virtual_balance.collect"))
-                    .addLoreLine(TextUtil.gui("virtual_balance.stored", this.getCurrency().formatValueText(this.storedMoney, false).copy().withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.YELLOW))
+                    .addLoreLine(TextUtil.gui("virtual_balance.stored", this.getCurrency().formatValueComponent(this.storedMoney, false).copy().withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.YELLOW))
                     .setCallback((x, y, z, g) -> {
                         var gui = (ShopGui) g;
                         gui.playClickSound();
@@ -477,19 +487,19 @@ public abstract class PriceHandler extends GenericHandler {
         }
 
         @Override
-        public GuiElementInterface getUserElement() {
-            return new GuiElementInterface() {
+        public GuiElement getUserElement() {
+            return new GuiElement() {
                 @Override
                 public ItemStack getItemStack() {
                     return ItemStack.EMPTY;
                 }
 
                 @Override
-                public ItemStack getItemStackForDisplay(GuiInterface gui) {
+                public ItemStack getItemStackForDisplay(GuiLike gui) {
                     var ac = VirtualBalance.this.getSelectedAccount(gui.getPlayer());
 
 
-                    return GuiElementBuilder.from(ac != null ? ac.accountIcon() : GuiElements.HEAD_QUESTION_MARK)
+                    return GuiElementBuilder.from(ac != null ? ac.accountIcon() : GuiElements.HEAD_QUESTION_MARK.asStack())
                             .setName(TextUtil.gui("virtual_balance.selected_account", (ac != null ? ac.name().copy() : TextUtil.text("not_set")).withStyle(ChatFormatting.GRAY)))
                             .addLoreLine(TextUtil.gui("virtual_balance.balance", (ac != null ? ac.formattedBalance().copy() : TextUtil.text("not_set")).withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.YELLOW))
                             .addLoreLine(Component.empty())
@@ -540,7 +550,7 @@ public abstract class PriceHandler extends GenericHandler {
                 }
             }
 
-            return CommonEconomy.getAccounts(player, this.getCurrency()).stream().sorted(Comparator.comparing(x -> -x.balance())).findFirst().orElse(null);
+            return CommonEconomy.getAccounts(player, this.getCurrency()).stream().sorted(Comparator.comparing(x -> x.balance().negate())).findFirst().orElse(null);
         }
 
         @Override

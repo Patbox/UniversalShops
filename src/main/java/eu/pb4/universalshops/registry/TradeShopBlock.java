@@ -5,6 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import eu.pb4.polymer.core.api.block.PolymerHeadBlock;
 import net.fabricmc.fabric.api.block.BlockAttackInteractionAware;
+import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -28,7 +29,6 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.packettweaker.PacketContext;
 
 public class TradeShopBlock extends BaseEntityBlock implements PolymerHeadBlock, BlockAttackInteractionAware {
     public static Property<Direction> ATTACHED = EnumProperty.create("attachment", Direction.class, (x) -> x != Direction.UP);

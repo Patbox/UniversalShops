@@ -2,7 +2,7 @@ package eu.pb4.universalshops.gui;
 
 import eu.pb4.polymer.networking.api.server.PolymerServerNetworking;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
-import eu.pb4.sgui.api.gui.SlotGuiInterface;
+import eu.pb4.sgui.api.gui.SlotBasedGui;
 import eu.pb4.universalshops.UniversalShopsMod;
 import eu.pb4.universalshops.other.USUtil;
 import net.minecraft.core.Holder;
@@ -13,7 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 
-public interface ExtraGui extends SlotGuiInterface {
+public interface ExtraGui extends SlotBasedGui {
     default void playClickSound() {
         playSound(SoundEvents.UI_BUTTON_CLICK);
     }

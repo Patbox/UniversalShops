@@ -1,9 +1,9 @@
 package eu.pb4.universalshops.gui.setup;
 
-import eu.pb4.sgui.api.GuiHelpers;
+import eu.pb4.sgui.api.SguiUtils;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
-import eu.pb4.sgui.api.elements.GuiElementInterface;
-import eu.pb4.sgui.api.gui.GuiInterface;
+import eu.pb4.sgui.api.elements.GuiElement;
+import eu.pb4.sgui.api.gui.GuiLike;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import eu.pb4.universalshops.gui.ExtraGui;
 import eu.pb4.universalshops.gui.GuiBackground;
@@ -17,11 +17,11 @@ import net.minecraft.world.item.Items;
 
 public class ItemModificatorGui extends SimpleGui implements ExtraGui {
     private final ItemStackHolder holder;
-    private final GuiInterface previousGui;
+    private final GuiLike previousGui;
 
     public ItemModificatorGui(ServerPlayer player, ItemStackHolder holder) {
         super(MenuType.GENERIC_9x3, player, false);
-        this.previousGui = GuiHelpers.getCurrentGui(player);
+        this.previousGui = SguiUtils.getCurrentGui(player);
         this.holder = holder;
 
         if (!hasTexture()) {
@@ -32,12 +32,12 @@ public class ItemModificatorGui extends SimpleGui implements ExtraGui {
 
         this.setSlot(9 * 1 + 1, stackHolderElement(holder, false));
         if (!hasTexture()) {
-            this.setSlot(9 * 2 + 1, new GuiElementBuilder(Items.LIGHT_BLUE_STAINED_GLASS_PANE).setName(TextUtil.gui("modifying_item.change_item")).setCallback((a, b, c) -> {
+            this.setSlot(9 * 2 + 1, new GuiElementBuilder(Items.LIGHT_BLUE_STAINED_GLASS_PANE).setName(TextUtil.gui("modifying_item.change_item")).setCallback(() -> {
                 this.playClickSound();
                 new SelectItemGui(player, holder);
             }));
         }
-        this.setSlot(9 * 1 + 3, GuiElementBuilder.from(GuiElements.MINUS).setName(TextUtil.gui("modifying_item.stack_decrease")).setCallback((a, b, c) -> {
+        this.setSlot(9 * 1 + 3, GuiElementBuilder.from(GuiElements.MINUS.asStack()).setName(TextUtil.gui("modifying_item.stack_decrease")).setCallback(() -> {
             if (this.holder.getItemStack().getCount() > 1) {
                 this.playClickSound();
                 this.holder.getItemStack().shrink(1);
@@ -46,7 +46,7 @@ public class ItemModificatorGui extends SimpleGui implements ExtraGui {
             }
         }));
 
-        this.setSlot(9 * 1 + 4, GuiElementBuilder.from(GuiElements.PLUS).setName(TextUtil.gui("modifying_item.stack_increase")).setCallback((a, b, c) -> {
+        this.setSlot(9 * 1 + 4, GuiElementBuilder.from(GuiElements.PLUS.asStack()).setName(TextUtil.gui("modifying_item.stack_increase")).setCallback(() -> {
             if (this.holder.getItemStack().getCount() < 64) {
                 this.playClickSound();
                 this.holder.getItemStack().grow(1);
@@ -67,15 +67,15 @@ public class ItemModificatorGui extends SimpleGui implements ExtraGui {
         this.open();
     }
 
-    private GuiElementInterface setStackSizeElement(Item item, int i) {
-        return new GuiElementBuilder(item).setName(TextUtil.gui("modifying_item.stack_size", i)).setCount(i).hideDefaultTooltip().setCallback((a, b, c) -> {
+    private GuiElement setStackSizeElement(Item item, int i) {
+        return new GuiElementBuilder(item).setName(TextUtil.gui("modifying_item.stack_size", i)).setCount(i).hideDefaultTooltip().setCallback(() -> {
             this.playClickSound();
             this.holder.getItemStack().setCount(i);
         }).build();
     }
 
-    public static GuiElementInterface stackHolderElement(ItemStackHolder holder, boolean opensGui) {
-        return new GuiElementInterface() {
+    public static GuiElement stackHolderElement(ItemStackHolder holder, boolean opensGui) {
+        return new GuiElement() {
             @Override
             public ItemStack getItemStack() {
                 return holder.getItemStack();

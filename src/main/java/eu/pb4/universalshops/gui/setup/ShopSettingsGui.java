@@ -93,7 +93,7 @@ public class ShopSettingsGui extends BaseShopGui {
     private void updatePrice() {
         var handler = this.be.priceHandler;
 
-        var b = GuiElementBuilder.from(handler.definition().icon)
+        var b = GuiElementBuilder.from(handler.definition().icon.get())
                 .setName(TextUtil.gui("setup.price_type", handler.definition().displayName.copy().withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.WHITE));
 
         if (!handler.canSwitch()) {
@@ -142,7 +142,7 @@ public class ShopSettingsGui extends BaseShopGui {
 
     private void updateStock() {
         var handler = this.be.stockHandler;
-        var b = GuiElementBuilder.from(handler.definition().icon)
+        var b = GuiElementBuilder.from(handler.definition().icon.get())
                 .setName(TextUtil.gui("setup.stock_type", handler.definition().displayName.copy().withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.WHITE));
 
         if (!handler.canSwitch()) {

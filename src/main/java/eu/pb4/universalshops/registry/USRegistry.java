@@ -2,7 +2,7 @@ package eu.pb4.universalshops.registry;
 
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
 import eu.pb4.universalshops.UniversalShopsMod;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -33,7 +33,7 @@ public class USRegistry {
     }
 
     public static void register() {
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register((c) -> {
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register((c) -> {
             c.accept(ITEM);
 
             if (c.shouldShowOpRestrictedItems()) {

@@ -1,13 +1,14 @@
 package eu.pb4.universalshops.gui.setup;
 
-import eu.pb4.polymer.core.api.item.PolymerItemGroupUtils;
-import eu.pb4.polymer.core.impl.interfaces.ItemGroupExtra;
+import eu.pb4.polymer.core.api.item.PolymerCreativeModeTabUtils;
 import eu.pb4.sgui.api.ClickType;
-import eu.pb4.sgui.api.GuiHelpers;
+import eu.pb4.sgui.api.SguiUtils;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
-import eu.pb4.sgui.api.gui.GuiInterface;
+import eu.pb4.sgui.api.elements.SimpleGuiElement;
+import eu.pb4.sgui.api.gui.GuiLike;
 import eu.pb4.sgui.api.gui.SimpleGui;
+import eu.pb4.sgui.api.gui.SlotBasedGui;
 import eu.pb4.universalshops.gui.ExtraGui;
 import eu.pb4.universalshops.gui.GuiBackground;
 import eu.pb4.universalshops.gui.GuiElements;
@@ -15,6 +16,7 @@ import eu.pb4.universalshops.other.TextUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -31,7 +33,7 @@ public class SelectItemGui extends SimpleGui implements ExtraGui {
     private static final List<CreativeModeTab> ITEM_GROUPS = new ArrayList<>();
 
     private final ItemModificatorGui.ItemStackHolder holder;
-    private final GuiInterface previousGui;
+    private final GuiLike previousGui;
     private CreativeModeTab currentGroup = CreativeModeTabs.searchTab();
     private List<ItemStack> currentItems = ITEM_GROUP_ITEMS.get(this.currentGroup);
     private int page;
@@ -39,7 +41,7 @@ public class SelectItemGui extends SimpleGui implements ExtraGui {
     public SelectItemGui(ServerPlayer player, ItemModificatorGui.ItemStackHolder holder) {
         super(MenuType.GENERIC_9x6, player, false);
         this.holder = holder;
-        this.previousGui = GuiHelpers.getCurrentGui(player);
+        this.previousGui = SguiUtils.getCurrentGui(player);
         if (!hasTexture()) {
             for (int i = 0; i < 9; i++) {
                 this.setSlot(9 * 5 + i, GuiElements.FILLER);
@@ -79,11 +81,11 @@ public class SelectItemGui extends SimpleGui implements ExtraGui {
     private void updateItemsVisual() {
         for (int x = 0; x < 9 * 5; x++) {
             var i = this.page * 9 * 5 + x;
-            this.setSlot(x, i < this.currentItems.size() ? GuiElementBuilder.from(this.currentItems.get(i)).setCallback(this::setStack).build() : GuiElement.EMPTY);
+            this.setSlot(x, i < this.currentItems.size() ? GuiElementBuilder.from(this.currentItems.get(i)).setCallback(this::setStack).build() : SimpleGuiElement.EMPTY);
         }
     }
 
-    private void setStack(int i, ClickType type, net.minecraft.world.inventory.ClickType slotActionType) {
+    private void setStack(int i, ClickType type, ContainerInput slotActionType, SlotBasedGui gui) {
         this.holder.setItemStack(this.currentItems.get(i + this.page * 9 * 5).copy());
         this.playClickSound();
         this.close();
@@ -107,9 +109,9 @@ public class SelectItemGui extends SimpleGui implements ExtraGui {
 
         for (var group : CreativeModeTabs.allTabs()) {
             if (group.getType() == CreativeModeTab.Type.CATEGORY) {
-                var contents = PolymerItemGroupUtils.getContentsFor(group, server.registryAccess().freeze(), server.overworld().enabledFeatures(), false);
+                var contents = PolymerCreativeModeTabUtils.getContentsFor(group, server.registryAccess().freeze(), server.overworld().enabledFeatures(), false);
 
-                if (contents.main().size() > 0) {
+                if (!contents.main().isEmpty()) {
                     ITEM_GROUP_ITEMS.put(group, new ArrayList<>(contents.main()));
                     ITEM_GROUPS.add(group);
                 }
@@ -117,10 +119,10 @@ public class SelectItemGui extends SimpleGui implements ExtraGui {
             }
         }
 
-        for (var group : PolymerItemGroupUtils.REGISTRY) {
-            var contents = PolymerItemGroupUtils.getContentsFor(group, server.registryAccess().freeze(), server.overworld().enabledFeatures(), false);
+        for (var group : PolymerCreativeModeTabUtils.REGISTRY) {
+            var contents = PolymerCreativeModeTabUtils.getContentsFor(group, server.registryAccess().freeze(), server.overworld().enabledFeatures(), false);
 
-            if (contents.main().size() > 0) {
+            if (!contents.main().isEmpty()) {
                 ITEM_GROUP_ITEMS.put(group, new ArrayList<>(contents.main()));
                 ITEM_GROUPS.add(group);
             }
@@ -180,17 +182,17 @@ public class SelectItemGui extends SimpleGui implements ExtraGui {
 
                     this.setSlot(x, b.setCallback(this::setItemGroup).build());
                 } else {
-                    this.setSlot(x, GuiElement.EMPTY);
+                    this.setSlot(x, SimpleGuiElement.EMPTY);
                 }
             }
         }
 
         @Override
-        public void onClose() {
+        public void onManualClose() {
             SelectItemGui.this.open();
         }
 
-        private void setItemGroup(int i, ClickType type, net.minecraft.world.inventory.ClickType slotActionType) {
+        private void setItemGroup(int i, ClickType type, ContainerInput slotActionType, SlotBasedGui gui) {
             var group = ITEM_GROUPS.get(this.page * 9 * 5 + i);
             SelectItemGui.this.playClickSound();
 

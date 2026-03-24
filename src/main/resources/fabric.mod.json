@@ -34,7 +34,7 @@
     "polymer-core": "*",
     "polymer-virtual-entity": "*",
     "polymer-resource-pack": "*",
-    "minecraft": ">=1.21.11- <2.0",
-    "java": ">=21"
+    "minecraft": ">=26.1",
+    "java": ">=25"
   }
 }

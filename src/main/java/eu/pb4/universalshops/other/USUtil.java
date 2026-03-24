@@ -1,14 +1,16 @@
 package eu.pb4.universalshops.other;
 
+import eu.pb4.polymer.common.impl.FabricPermissionBridge;
 import eu.pb4.universalshops.UniversalShopsMod;
-import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSoundEntityPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.PermissionLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
@@ -93,19 +95,19 @@ public class USUtil {
     }
 
     public static boolean checkAdmin(Player player, String permission) {
-        return Permissions.check(player, UniversalShopsMod.MOD_ID + "." + permission, 3);
+        return FabricPermissionBridge.checkPermission(player, Identifier.fromNamespaceAndPath(UniversalShopsMod.MOD_ID, permission), PermissionLevel.ADMINS);
     }
 
     public static Predicate<CommandSourceStack> requireAdmin(String permission) {
-        return Permissions.require(UniversalShopsMod.MOD_ID + "." + permission, 3);
+        return FabricPermissionBridge.require(Identifier.fromNamespaceAndPath(UniversalShopsMod.MOD_ID, permission), PermissionLevel.ADMINS);
     }
 
     public static boolean checkDefault(Player player, String permission) {
-        return Permissions.check(player, UniversalShopsMod.MOD_ID + "." + permission, true);
+        return FabricPermissionBridge.checkPermission(player, Identifier.fromNamespaceAndPath(UniversalShopsMod.MOD_ID, permission), PermissionLevel.ALL);
     }
 
     public static Predicate<CommandSourceStack> requireDefault(String permission) {
-        return Permissions.require(UniversalShopsMod.MOD_ID + "." + permission, true);
+        return FabricPermissionBridge.require(Identifier.fromNamespaceAndPath(UniversalShopsMod.MOD_ID, permission), PermissionLevel.ALL);
     }
 
     public static SimpleContainer copyInventory(NonNullList<ItemStack> input) {

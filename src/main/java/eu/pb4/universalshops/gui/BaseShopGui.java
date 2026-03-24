@@ -1,7 +1,7 @@
 package eu.pb4.universalshops.gui;
 
-import eu.pb4.sgui.api.GuiHelpers;
-import eu.pb4.sgui.api.gui.GuiInterface;
+import eu.pb4.sgui.api.SguiUtils;
+import eu.pb4.sgui.api.gui.GuiLike;
 import eu.pb4.sgui.api.gui.SimpleGui;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
 import net.minecraft.network.chat.Component;
@@ -14,13 +14,13 @@ public class BaseShopGui extends SimpleGui implements ShopGui {
     private final Component texture;
     private int titleTimer = -1;
     private Component realTitle = Component.empty();
-    private final GuiInterface previousGui;
+    private final GuiLike previousGui;
 
     public BaseShopGui(MenuType type, ServerPlayer player, TradeShopBlockEntity blockEntity, Component texture) {
         super(type, player, false);
         this.be = blockEntity;
         this.texture = texture;
-        this.previousGui = GuiHelpers.getCurrentGui(player);
+        this.previousGui = SguiUtils.getCurrentGui(player);
     }
 
     @Override

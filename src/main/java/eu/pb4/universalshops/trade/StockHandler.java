@@ -1,6 +1,6 @@
 package eu.pb4.universalshops.trade;
 
-import eu.pb4.sgui.api.elements.GuiElementInterface;
+import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.universalshops.gui.*;
 import eu.pb4.universalshops.gui.selling.AnyStackShopGui;
 import eu.pb4.universalshops.gui.selling.SingleItemShopGui;
@@ -12,6 +12,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -61,10 +63,10 @@ public abstract class StockHandler extends GenericHandler {
 
     public static abstract class Definition extends GenericHandler.Definition<StockHandler>  {
         public Definition(String type, Item icon) {
-            this(type, TextUtil.of("stockhandler", type), icon.getDefaultInstance());
+            this(type, TextUtil.of("stockhandler", type), icon::getDefaultInstance);
         }
 
-        public Definition(String type, Component displayName, ItemStack icon) {
+        public Definition(String type, Component displayName, Supplier<ItemStack> icon) {
             super(type, displayName, icon);
         }
     }
@@ -80,7 +82,7 @@ public abstract class StockHandler extends GenericHandler {
     }
 
     public static final class Invalid extends StockHandler {
-        public static final StockHandler.Definition  DEFINITION = new StockHandler.Definition("invalid", TextUtil.text("not_set"), GuiElements.HEAD_QUESTION_MARK) {
+        public static final StockHandler.Definition  DEFINITION = new StockHandler.Definition("invalid", TextUtil.text("not_set"), GuiElements.HEAD_QUESTION_MARK::asStack) {
             @Override
             public StockHandler createFromData(ValueInput view, TradeShopBlockEntity blockEntity) {
                 return new Invalid(this, blockEntity);
@@ -108,7 +110,7 @@ public abstract class StockHandler extends GenericHandler {
 
         @Override
         public ItemStack icon() {
-            return GuiElements.HEAD_QUESTION_MARK.copy();
+            return GuiElements.HEAD_QUESTION_MARK.asStack();
         }
 
         @Override
@@ -168,7 +170,7 @@ public abstract class StockHandler extends GenericHandler {
         }
 
         @Override
-        public GuiElementInterface getSetupElement() {
+        public GuiElement getSetupElement() {
             return ItemModificatorGui.stackHolderElement(this, true);
         }
 
@@ -245,7 +247,7 @@ public abstract class StockHandler extends GenericHandler {
         public ItemStack icon() {
             var container = this.shop.getContainer();
             if (container.isEmpty()) {
-                return GuiElements.HEAD_QUESTION_MARK.copy();
+                return GuiElements.HEAD_QUESTION_MARK.asStack();
             } else {
                 var list = new ArrayList<ItemStack>(container.getContainerSize());
                 for (int i = 0; i < container.getContainerSize(); i++) {

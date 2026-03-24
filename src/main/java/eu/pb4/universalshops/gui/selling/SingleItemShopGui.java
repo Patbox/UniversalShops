@@ -1,6 +1,7 @@
 package eu.pb4.universalshops.gui.selling;
 
 import eu.pb4.sgui.api.ClickType;
+import eu.pb4.sgui.api.gui.SlotBasedGui;
 import eu.pb4.universalshops.other.USUtil;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
@@ -9,6 +10,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.item.ItemStack;
 
 public class SingleItemShopGui extends SingleGenericShopGui {
@@ -21,7 +23,7 @@ public class SingleItemShopGui extends SingleGenericShopGui {
         return USUtil.asText(((StockHandler.SingleItem) this.be.stockHandler).value);
     }
 
-    protected void buyItem(int i, ClickType clickType, net.minecraft.world.inventory.ClickType slotActionType) {
+    protected void buyItem(int i, ClickType clickType, ContainerInput slotActionType, SlotBasedGui gui) {
         var stockHandler = (StockHandler.SingleItem) this.be.stockHandler;
 
         var stockCount = this.be.stockHandler.getMaxAmount(player);

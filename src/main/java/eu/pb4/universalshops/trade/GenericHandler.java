@@ -1,6 +1,6 @@
 package eu.pb4.universalshops.trade;
 
-import eu.pb4.sgui.api.elements.GuiElementInterface;
+import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.universalshops.gui.GuiElements;
 import eu.pb4.universalshops.other.TextUtil;
 import eu.pb4.universalshops.registry.TradeShopBlockEntity;
@@ -10,6 +10,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+
+import java.util.function.Supplier;
 
 public abstract class GenericHandler {
     public final TradeShopBlockEntity shop;
@@ -24,16 +26,16 @@ public abstract class GenericHandler {
         return definition;
     }
 
-    public GuiElementInterface getSetupElement() {
-        return GuiElements.FILLER;
+    public GuiElement getSetupElement() {
+        return GuiElements.FILLER.build();
     }
 
-    public GuiElementInterface getAccessElement() {
-        return GuiElements.FILLER;
+    public GuiElement getAccessElement() {
+        return GuiElements.FILLER.build();
     }
 
-    public GuiElementInterface getUserElement() {
-        return GuiElements.FILLER;
+    public GuiElement getUserElement() {
+        return GuiElements.FILLER.build();
     }
 
     public abstract ItemStack icon();
@@ -53,13 +55,13 @@ public abstract class GenericHandler {
     public static abstract class Definition<T extends GenericHandler> {
         public final String type;
         public final Component displayName;
-        public final ItemStack icon;
+        public final Supplier<ItemStack> icon;
 
         public Definition(String type, Item icon) {
-            this(type, TextUtil.of("pricehandler", type), icon.getDefaultInstance());
+            this(type, TextUtil.of("pricehandler", type), icon::getDefaultInstance);
         }
 
-        public Definition(String type, Component displayName, ItemStack icon) {
+        public Definition(String type, Component displayName, Supplier<ItemStack> icon) {
             this.type = type;
             this.displayName = displayName;
             this.icon = icon;

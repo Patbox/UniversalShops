@@ -4,6 +4,8 @@ import eu.pb4.sgui.api.ClickType;
 import eu.pb4.sgui.api.elements.AnimatedGuiElement;
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
+import eu.pb4.sgui.api.elements.SimpleGuiElement;
+import eu.pb4.sgui.api.gui.SlotBasedGui;
 import eu.pb4.universalshops.gui.BaseShopGui;
 import eu.pb4.universalshops.gui.GuiBackground;
 import eu.pb4.universalshops.gui.GuiElements;
@@ -14,6 +16,7 @@ import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -66,11 +69,11 @@ public abstract class SingleGenericShopGui extends BaseShopGui {
         if (this.be.isOwner(this.player)) {
             var x = this.be.priceHandler.getAccessElement();
 
-            this.setSlot(2 * 9, hasTexture() && GuiElements.FILLER == x ? GuiElement.EMPTY : x);
+            this.setSlot(2 * 9, hasTexture() && GuiElements.FILLER == x ? SimpleGuiElement.EMPTY : x);
         }
         var x = this.be.priceHandler.getUserElement();
 
-        this.setSlot(0 * 9 + 2, hasTexture() && GuiElements.FILLER == x ? GuiElement.EMPTY : x);
+        this.setSlot(0 * 9 + 2, hasTexture() && GuiElements.FILLER == x ? SimpleGuiElement.EMPTY : x);
 
         {
             var canBuy = maxStockCount > 0;
@@ -135,7 +138,7 @@ public abstract class SingleGenericShopGui extends BaseShopGui {
 
     protected abstract Component getMainText();
 
-    protected abstract void buyItem(int i, ClickType clickType, net.minecraft.world.inventory.ClickType slotActionType);
+    protected abstract void buyItem(int i, ClickType clickType, ContainerInput slotActionType, SlotBasedGui gui);
 
     @Override
     public TradeShopBlockEntity getBE() {

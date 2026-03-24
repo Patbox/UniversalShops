@@ -10,6 +10,9 @@ import eu.pb4.universalshops.gui.setup.ShopSettingsGui;
 import eu.pb4.universalshops.other.*;
 import eu.pb4.universalshops.trade.PriceHandler;
 import eu.pb4.universalshops.trade.StockHandler;
+import net.minecraft.server.players.NameAndId;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerListener;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -25,7 +28,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
-import net.minecraft.world.ContainerListener;
 import net.minecraft.world.Containers;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.Display;
@@ -48,7 +50,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     public PriceHandler priceHandler = PriceHandler.Invalid.DEFINITION.createInitial(this);
     public StockHandler stockHandler = StockHandler.Invalid.DEFINITION.createInitial(this);
     @Nullable
-    public GameProfile owner;
+    public NameAndId owner;
     public HologramMode hologramMode = HologramMode.FULL;
     private int[] cachedSlots = new int[0];
     private ElementHolder elementHolder;
@@ -290,7 +292,12 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     }
 
     @Override
-    public void containerChanged(Container sender) {
+    public void slotChanged(AbstractContainerMenu container, int slotIndex, ItemStack itemStack) {
+        this.setChanged();
+    }
+
+    @Override
+    public void dataChanged(AbstractContainerMenu container, int id, int value) {
         this.setChanged();
     }
 

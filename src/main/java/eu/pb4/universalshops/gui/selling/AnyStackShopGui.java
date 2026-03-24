@@ -1,9 +1,7 @@
 package eu.pb4.universalshops.gui.selling;
 
-import eu.pb4.sgui.api.elements.AnimatedGuiElement;
+import eu.pb4.sgui.api.elements.*;
 import eu.pb4.sgui.api.elements.GuiElement;
-import eu.pb4.sgui.api.elements.GuiElementBuilder;
-import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.universalshops.gui.BaseShopGui;
 import eu.pb4.universalshops.gui.GuiBackground;
 import eu.pb4.universalshops.gui.GuiElements;
@@ -82,10 +80,10 @@ public class AnyStackShopGui extends BaseShopGui {
     private void updateValueDisplays() {
         if (this.be.isOwner(this.player)) {
             var x = this.be.priceHandler.getAccessElement();
-            this.setSlot(4 * 9, hasTexture() && GuiElements.FILLER == x ? GuiElement.EMPTY : x);
+            this.setSlot(4 * 9, hasTexture() && GuiElements.FILLER == x ? SimpleGuiElement.EMPTY : x);
         }
         var x = this.be.priceHandler.getUserElement();
-        this.setSlot(1 * 9, hasTexture() && GuiElements.FILLER == x ? GuiElement.EMPTY : x);
+        this.setSlot(1 * 9, hasTexture() && GuiElements.FILLER == x ? SimpleGuiElement.EMPTY : x);
 
         {
             var canBuy = maxStockCount > 0;
@@ -140,7 +138,7 @@ public class AnyStackShopGui extends BaseShopGui {
         for (int x = 0; x < 6; x++) {
             for (int y = 0; y < 6; y++) {
                 var i = this.page * 36 + x + y * 6;
-                this.setSlot(x + y * 9 + 3, i < this.items.size() ? this.items.get(i) : GuiElement.EMPTY);
+                this.setSlot(x + y * 9 + 3, i < this.items.size() ? this.items.get(i) : SimpleGuiElement.EMPTY);
             }
         }
 
@@ -162,7 +160,7 @@ public class AnyStackShopGui extends BaseShopGui {
         }
     }
 
-    private record BuyElement(ItemStack itemStack, int slot) implements GuiElementInterface {
+    private record BuyElement(ItemStack itemStack, int slot) implements GuiElement {
         @Override
         public ItemStack getItemStack() {
             return this.itemStack;
