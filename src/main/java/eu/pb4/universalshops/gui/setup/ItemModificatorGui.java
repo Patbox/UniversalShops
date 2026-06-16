@@ -32,7 +32,7 @@ public class ItemModificatorGui extends SimpleGui implements ExtraGui {
 
         this.setSlot(9 * 1 + 1, stackHolderElement(holder, false));
         if (!hasTexture()) {
-            this.setSlot(9 * 2 + 1, new GuiElementBuilder(Items.LIGHT_BLUE_STAINED_GLASS_PANE).setName(TextUtil.gui("modifying_item.change_item")).setCallback(() -> {
+            this.setSlot(9 * 2 + 1, new GuiElementBuilder(Items.STAINED_GLASS_PANE.lightBlue()).setName(TextUtil.gui("modifying_item.change_item")).setCallback(() -> {
                 this.playClickSound();
                 new SelectItemGui(player, holder);
             }));

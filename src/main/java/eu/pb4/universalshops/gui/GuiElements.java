@@ -16,7 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 public class GuiElements {
-    public static final GuiElementBuilderCreator<?> FILLER = new GuiElementBuilder(Items.WHITE_STAINED_GLASS_PANE).setName(Component.empty()).hideTooltip();
+    public static final GuiElementBuilderCreator<?> FILLER = new GuiElementBuilder(Items.STAINED_GLASS_PANE.white()).setName(Component.empty()).hideTooltip();
     public static final GuiElementBuilderCreator<?> SETTINGS = new GuiElementBuilder(Items.REDSTONE).setName(TextUtil.gui("shop.settings")).setCallback(ShopGui::openSettingsCallback);
     public static final GuiElementBuilderCreator<?> CURRENCY_INVENTORY = new GuiElementBuilder(Items.CHEST).setName(TextUtil.gui("shop.currency_storage")).setCallback(ShopGui::openCurrencyCallback);
     public static final GuiElementBuilderCreator<?> BACK = new GuiElementBuilder(Items.STRUCTURE_VOID).setName(CommonComponents.GUI_BACK.copy().withStyle(ChatFormatting.WHITE)).setCallback((a, b, c, g) -> {
@@ -40,7 +40,7 @@ public class GuiElements {
     private static final Style BASE_LORE = Style.EMPTY.applyFormat(ChatFormatting.GRAY).withItalic(false);
 
     public static GuiElement priceMarker(Component item, List<Component> lore) {
-        var b = new GuiElementBuilder(Items.GREEN_STAINED_GLASS_PANE).setName(TextUtil.gui("shop.price_info", Component.empty().append(item).withStyle(ChatFormatting.GRAY)));
+        var b = new GuiElementBuilder(Items.STAINED_GLASS_PANE.green()).setName(TextUtil.gui("shop.price_info", Component.empty().append(item).withStyle(ChatFormatting.GRAY)));
 
         for (var text : lore) {
             b.addLoreLine(Component.empty().append(text).setStyle(BASE_LORE));
@@ -50,7 +50,7 @@ public class GuiElements {
     }
 
     public static GuiElement itemMarker(Component item, List<Component> lore) {
-        var b = new GuiElementBuilder(Items.LIGHT_BLUE_STAINED_GLASS_PANE).setName(TextUtil.gui("shop.stock_info", Component.empty().append(item).withStyle(ChatFormatting.GRAY)));
+        var b = new GuiElementBuilder(Items.STAINED_GLASS_PANE.lightBlue()).setName(TextUtil.gui("shop.stock_info", Component.empty().append(item).withStyle(ChatFormatting.GRAY)));
 
         for (var text : lore) {
             b.addLoreLine(Component.empty().append(text).setStyle(BASE_LORE));

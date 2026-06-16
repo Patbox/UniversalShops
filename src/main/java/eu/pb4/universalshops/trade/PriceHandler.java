@@ -381,7 +381,7 @@ public abstract class PriceHandler extends GenericHandler {
                 return !CommonEconomy.getCurrencies(player.level().getServer()).isEmpty();
             }
         };
-        private static final GuiElementBuilderCreator<?> SETTINGS = new GuiElementBuilder(Items.GREEN_STAINED_GLASS_PANE).setName(TextUtil.text("configure")).setCallback((a, b, c, g) -> {
+        private static final GuiElementBuilderCreator<?> SETTINGS = new GuiElementBuilder(Items.STAINED_GLASS_PANE.green()).setName(TextUtil.text("configure")).setCallback((a, b, c, g) -> {
             if (g instanceof ShopGui gui) {
                 gui.playClickSound();
                 new VirtualBalanceSettingsGui(gui.getPlayer(), gui.getBE(), (VirtualBalanceSettingsGui.Controller) gui.getBE().priceHandler);
