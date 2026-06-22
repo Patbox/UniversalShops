@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "util",
   "key": {
     "P": "#minecraft:planks",
     "W": "#minecraft:wool",
@@ -10,7 +9,5 @@
     "PWP",
     "PIP"
   ],
-  "result": {
-    "id": "universal_shops:trade_block"
-  }
+  "result": "universal_shops:trade_block"
 }
