@@ -5,6 +5,7 @@ import eu.pb4.polymer.networking.api.client.PolymerClientNetworking;
 import eu.pb4.polymer.networking.api.server.PolymerServerNetworking;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.universalshops.gui.setup.SelectItemGui;
+import eu.pb4.universalshops.other.ShopStorageAccess;
 import eu.pb4.universalshops.other.USCommands;
 import eu.pb4.universalshops.registry.USRegistry;
 import eu.pb4.universalshops.trade.PriceHandler;
@@ -36,6 +37,7 @@ public class UniversalShopsMod implements ModInitializer, ClientModInitializer {
         USRegistry.register();
         PriceHandler.init();
         StockHandler.init();
+        ShopStorageAccess.register();
         ServerLifecycleEvents.SERVER_STARTED.register(SelectItemGui::updateCachedItems);
         CommandRegistrationCallback.EVENT.register(USCommands::register);
 

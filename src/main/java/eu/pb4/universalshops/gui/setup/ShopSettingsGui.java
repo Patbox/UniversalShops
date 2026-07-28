@@ -29,6 +29,7 @@ public class ShopSettingsGui extends BaseShopGui {
         this.updatePrice();
         this.updateHologram();
         this.updateHopper();
+        this.updateStorageProtection();
 
         if (!hasTexture()) {
             while (this.getFirstEmptySlot() != -1) {
@@ -64,6 +65,29 @@ public class ShopSettingsGui extends BaseShopGui {
         }
 
         this.setSlot(9 * 2 + 3 + 1, x);
+    }
+
+    private void updateStorageProtection() {
+        var element = new GuiElementBuilder(Items.ENDER_CHEST)
+                .setName(TextUtil.gui("setup.protect_storage", CommonComponents.optionStatus(this.be.protectStorage).copy().withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.WHITE))
+                .addLoreLine(Component.empty())
+                .addLoreLine(Component.empty()
+                        .append(Component.literal("» ").withStyle(ChatFormatting.DARK_GRAY))
+                        .append(TextUtil.gui("setup.click_to_toggle")).withStyle(ChatFormatting.GRAY)
+                )
+                .hideDefaultTooltip()
+                .setCallback((a, type, c, d) -> {
+                    this.playClickSound();
+                    this.be.protectStorage = !this.be.protectStorage;
+                    this.updateStorageProtection();
+                    this.markDirty();
+                });
+
+        if (this.be.protectStorage) {
+            element.glow();
+        }
+
+        this.setSlot(9 * 2 + 3 + 3, element);
     }
 
     private void updateHologram() {
