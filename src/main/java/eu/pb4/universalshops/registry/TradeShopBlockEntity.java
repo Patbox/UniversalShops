@@ -47,6 +47,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
     @Nullable
     public BlockPos containerPos;
     public boolean allowHoppers = false;
+    public boolean protectStorage = true;
     public PriceHandler priceHandler = PriceHandler.Invalid.DEFINITION.createInitial(this);
     public StockHandler stockHandler = StockHandler.Invalid.DEFINITION.createInitial(this);
     @Nullable
@@ -79,6 +80,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
         this.priceHandler.writeData(view);
         this.stockHandler.writeData(view);
         view.putBoolean("AllowHoppers", this.allowHoppers);
+        view.putBoolean("ProtectStorage", this.protectStorage);
         view.putString("HologramMode", this.hologramMode.name());
     }
 
@@ -106,6 +108,7 @@ public class TradeShopBlockEntity extends BlockEntity implements RemappedInvento
 
         }
         this.allowHoppers = view.getBooleanOr("AllowHoppers", false);
+        this.protectStorage = view.getBooleanOr("ProtectStorage", true);
     }
 
     public void tick() {
