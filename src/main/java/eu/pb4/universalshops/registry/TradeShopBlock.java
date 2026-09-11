@@ -12,7 +12,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -34,14 +36,21 @@ public class TradeShopBlock extends BaseEntityBlock implements PolymerHeadBlock,
     public static Property<Direction> ATTACHED = EnumProperty.create("attachment", Direction.class, (x) -> x != Direction.UP);
     public final boolean isAdmin;
 
-    public static final MapCodec<TradeShopBlock> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.BOOL.fieldOf("is_admin").forGetter(x -> x.isAdmin),
-            propertiesCodec()
-    ).apply(instance, TradeShopBlock::new));
-
     protected TradeShopBlock(boolean isAdmin, Properties settings) {
         super(settings);
         this.isAdmin = isAdmin;
+    }
+
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @org.jspecify.annotations.Nullable LivingEntity by, ItemStack itemStack) {
+        super.setPlacedBy(level, pos, state, by, itemStack);
+
+        if (level.getBlockEntity(pos) instanceof TradeShopBlockEntity shop) {
+            if (by instanceof ServerPlayer serverPlayer) {
+                shop.owner = serverPlayer.nameAndId();
+                shop.openSettings(serverPlayer);
+            }
+        }
     }
 
     @Override
@@ -126,10 +135,5 @@ public class TradeShopBlock extends BaseEntityBlock implements PolymerHeadBlock,
         }
 
         return true;
-    }
-
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
     }
 }

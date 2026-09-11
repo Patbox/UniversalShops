@@ -1,12 +1,6 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_the_recipe": {
-      "conditions": {
-        "recipe": "universal_shops:trade_block"
-      },
-      "trigger": "minecraft:recipe_unlocked"
-    },
     "item_required": {
       "conditions": {
         "items": [
@@ -48,8 +42,7 @@
     [
       "item_required",
       "item_required2",
-      "item_use",
-      "has_the_recipe"
+      "item_use"
     ]
   ],
   "rewards": {

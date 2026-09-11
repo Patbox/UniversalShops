@@ -1,6 +1,7 @@
 package eu.pb4.universalshops.registry;
 
 import eu.pb4.polymer.core.api.block.PolymerBlockUtils;
+import eu.pb4.polymer.core.api.item.PolymerHeadBlockItem;
 import eu.pb4.universalshops.UniversalShopsMod;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -18,10 +19,10 @@ public class USRegistry {
     public static final TradeShopBlock BLOCK = register("trade_block", (k) -> new TradeShopBlock(false, BlockBehaviour.Properties.of().setId(k).noOcclusion().strength(2.8F, 3600000.0F)), BuiltInRegistries.BLOCK);
     public static final TradeShopBlock BLOCK_ADMIN = register("admin_trade_block", (k) -> new TradeShopBlock(true, BlockBehaviour.Properties.of().setId(k).noOcclusion().strength(-1.0F, 3600000.0F).noLootTable()), BuiltInRegistries.BLOCK);
     public static final BlockEntityType<TradeShopBlockEntity> BLOCK_ENTITY_TYPE = register("trade_block", (k) -> FabricBlockEntityTypeBuilder.create(TradeShopBlockEntity::new, BLOCK, BLOCK_ADMIN).build(), BuiltInRegistries.BLOCK_ENTITY_TYPE);
-    public static final TradeShopBlockItem ITEM = register("trade_block", (k) ->
-            new TradeShopBlockItem(BLOCK, new Item.Properties().setId(k).useBlockDescriptionPrefix()), BuiltInRegistries.ITEM);
-    public static final TradeShopBlockItem ITEM_ADMIN = register("admin_trade_block", (k) ->
-            new TradeShopBlockItem(BLOCK_ADMIN, new Item.Properties().setId(k).useBlockDescriptionPrefix()), BuiltInRegistries.ITEM);
+    public static final PolymerHeadBlockItem ITEM = register("trade_block", (k) ->
+            new PolymerHeadBlockItem(BLOCK, new Item.Properties().setId(k).useBlockDescriptionPrefix()), BuiltInRegistries.ITEM);
+    public static final PolymerHeadBlockItem ITEM_ADMIN = register("admin_trade_block", (k) ->
+            new PolymerHeadBlockItem(BLOCK_ADMIN, new Item.Properties().setId(k).useBlockDescriptionPrefix()), BuiltInRegistries.ITEM);
 
     public static <A extends T, T> A register(String key, Function<ResourceKey<T>, A> value, Registry<T> registry) {
         var id = UniversalShopsMod.id(key);
