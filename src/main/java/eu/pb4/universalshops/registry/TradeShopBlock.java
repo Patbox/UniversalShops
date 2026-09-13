@@ -29,6 +29,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
@@ -66,6 +67,11 @@ public class TradeShopBlock extends BaseEntityBlock implements PolymerHeadBlock,
         }
 
         return -1;
+    }
+
+    @Override
+    protected boolean canBeReplaced(BlockState state, Fluid fluid) {
+        return false;
     }
 
     @Nullable
